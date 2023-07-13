@@ -1,18 +1,22 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore }  from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import Constants from 'expo-constants';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAV2CgHGL4mIqWTHYPuEm4z-jFDYTsHYa4",
-    authDomain: "sabor-universitario.firebaseapp.com",
-    projectId: "sabor-universitario",
-    storageBucket: "sabor-universitario.appspot.com",
-    messagingSenderId: "418863484962",
-    appId: "1:418863484962:web:65583a0ac06bc09e87ba7b",
-    measurementId: "G-254Z7G0QJ0"
-  };
+  apiKey: Constants?.expoConfig?.extra?.apiKey,
+  authDomain: Constants?.expoConfig?.extra?.authDomain,
+  projectId: Constants?.expoConfig?.extra?.projectId,
+  storageBucket: Constants?.expoConfig?.extra?.storageBucket,
+  messagingSenderId: Constants?.expoConfig?.extra?.messagingSenderId,
+  appId: Constants?.expoConfig?.extra?.appId,
+  measurementId: Constants?.expoConfig?.extra?.measurementId
+};
 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+const storage = getStorage();
 
-const initialApp = initializeApp(firebaseConfig);
-
-export const app = initialApp;
-export const db = getFirestore();
+export { app, auth, db, storage };

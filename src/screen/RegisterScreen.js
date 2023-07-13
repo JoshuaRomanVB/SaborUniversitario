@@ -20,7 +20,7 @@ import {colors} from '../styles/colors';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import * as ImagePicker from 'expo-image-picker';
 import {db} from '../utils/firebaseConfig';
-
+import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
 
 const RegisterScreen = ({navigation}) => {
   //Alert dialog
@@ -51,7 +51,26 @@ const RegisterScreen = ({navigation}) => {
   const [fileName, setFileName] = useState('');
 
   // Definir una referencia a una colección
-  const usersRef = db.collection('users');
+        const refCollection = collection(db, 'Tiendas');
+        const queryFetch = query(refCollection);
+
+        // Cada que se actualice la colección se ejecutara esta función 
+        //para traer las tiendas
+        const unsubscribe = onSnapshot(queryFetch, (querySnapshot) => {
+            setListStore(
+                querySnapshot.docs.map((item) => ({
+                        id_store: item.id,
+                        name_store: item.data().name_store,
+                        description: item.data().description
+                }))
+            )
+            const objStores = querySnapshot.docs.map((item) => ({
+                id_store: item.id,
+                ...item.data()
+            }))
+            setListStore(objStores);
+            
+        });
 
   const validateFields = () => {
     let isValid = true;
