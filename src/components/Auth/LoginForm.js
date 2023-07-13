@@ -19,8 +19,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { userDetails, user } from "../../utils/userDB";
 import CustomButton from "../CustomButton";
-import { auth } from "../../utils/firebaseConfig";
-
+import {getAuth, signInWithEmailAndPassword} from 'firebase/auth'
+import app from "../../utils/firebaseConfig";
 
 /**
 Componente de formulario de inicio de sesión
@@ -35,6 +35,9 @@ export default function LoginForm(props) {
   const { navigation } = props;
   const [error, setError] = useState("");
 
+
+  const auth = getAuth(app);
+
   const formik = useFormik({
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),
@@ -42,10 +45,20 @@ export default function LoginForm(props) {
     onSubmit: async (formData) => {
       setError("");
       const { username, password } = formData;
-    
+
       try {
-        await auth.signInWithEmailAndPassword(username, password);
-        navigation.navigate("Tabs");
+      signInWithEmailAndPassword(auth,username, password)
+          .then((userCredential) => {
+            // Acceso exitoso
+            navigation.navigate("Tabs");
+            const user = userCredential.user;
+            console.log(user);
+          })
+          .catch((error) => {
+            // Error de autenticación
+            console.log(error);
+          });
+
         // Aquí puedes redirigir al usuario a la pantalla de inicio o hacer cualquier otra acción necesaria después del inicio de sesión exitoso.
       } catch (error) {
         console.log("Error de inicio de sesión:", error);
@@ -84,51 +97,50 @@ Función para establecer el esquema de validación del formulario.
         source={require("../../assets/backgroudLogin.png")}
         style={styles.image} // Establece el color del borde de la imagen
       >
-<Text style={styles.title}>Bienvenido de nuevo</Text>
+        <Text style={styles.title}>Bienvenido de nuevo</Text>
       </ImageBackground>
 
+      <View style={styles.containerForm}>
+        <Text style={styles.title}>Bienvenido de nuevo</Text>
+        <Text style={styles.text}>Email</Text>
+        <TextInput
+          placeholder={"Correo"} // Corrección: placeholder en lugar de placehorder
+          placeholderTextColor="#C9C9C9"
+          style={styles.input}
+          autoCapitalize="none"
+          value={formik.values.username}
+          onChangeText={(text) => formik.setFieldValue("username", text)}
+        />
+        <Text style={styles.error}>{formik.errors.username}</Text>
+        <Text style={styles.text}>Contraseña</Text>
+        <TextInput
+          placeholder={"Contraseña"} // Corrección: placeholder en lugar de placehorder
+          placeholderTextColor="#C9C9C9"
+          style={styles.input}
+          autoCapitalize="none"
+          value={formik.values.password}
+          secureTextEntry={true}
+          onChangeText={(text) => formik.setFieldValue("password", text)}
+        />
+        <Text style={styles.error}>{formik.errors.password}</Text>
+        <CustomButton
+          title="¿Olvidaste tu contraseña?"
+          onPress={formik.handleSubmit}
+        />
+        <CustomButton title="Iniciar sesión" onPress={formik.handleSubmit} />
+        <Text style={styles.error}>{error}</Text>
 
-    <View style ={styles.containerForm}>
-
-      <Text style={styles.title}>Bienvenido de nuevo</Text>
-    <Text style={styles.text}>Email</Text>
-      <TextInput
-        placeholder={"Correo"} // Corrección: placeholder en lugar de placehorder
-        placeholderTextColor="#C9C9C9"
-        style={styles.input}
-        autoCapitalize="none"
-        value={formik.values.username}
-        onChangeText={(text) => formik.setFieldValue("username", text)}
-      />
-      <Text style={styles.error}>{formik.errors.username}</Text>
-      <Text style={styles.text}>Contraseña</Text>
-      <TextInput
-        placeholder={"Contraseña"} // Corrección: placeholder en lugar de placehorder
-        placeholderTextColor="#C9C9C9"
-        style={styles.input}
-        autoCapitalize="none"
-        value={formik.values.password}
-        secureTextEntry={true}
-        onChangeText={(text) => formik.setFieldValue("password", text)}
-      />
-      <Text style={styles.error}>{formik.errors.password}</Text>
-      <CustomButton
-        title="¿Olvidaste tu contraseña?"
-        onPress={formik.handleSubmit}
-      />
-      <CustomButton title="Iniciar sesión" onPress={formik.handleSubmit} />
-      <Text style={styles.error}>{error}</Text>
-
-      <Text>
-        ¿No tienes una cuenta?{" "}
-        <TouchableOpacity>
-          <Text style={{ fontWeight: "bold", textDecorationLine: "underline" }}>
-            Registrate
-          </Text>
-        </TouchableOpacity>
-      </Text>
-    </View>
-     
+        <Text>
+          ¿No tienes una cuenta?{" "}
+          <TouchableOpacity>
+            <Text
+              style={{ fontWeight: "bold", textDecorationLine: "underline" }}
+            >
+              Registrate
+            </Text>
+          </TouchableOpacity>
+        </Text>
+      </View>
     </View>
   );
 }
@@ -136,15 +148,15 @@ Función para establecer el esquema de validación del formulario.
 const styles = StyleSheet.create({
   input: {
     height: 50,
-    width: '100%',
+    width: "100%",
     padding: 10,
     borderRadius: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     color: "#000",
     // Estilos para Android
     elevation: 2,
     // Estilos para iOS
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -164,35 +176,34 @@ const styles = StyleSheet.create({
   },
   image: {
     height: 520,
-    width: '100%',
+    width: "100%",
     alignSelf: "center",
   },
 
   container: {
-    flex:1,
+    flex: 1,
   },
   containerForm: {
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     position: "absolute",
-    paddingHorizontal:30,
+    paddingHorizontal: 30,
     borderTopRightRadius: 40,
-    borderTopLeftRadius:40,
+    borderTopLeftRadius: 40,
     bottom: 0,
     left: 0,
     right: 0,
     height: 500,
-  
   },
-  title:{
-    marginTop:20,
-    color: '#557BF1',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 30
+  title: {
+    marginTop: 20,
+    color: "#557BF1",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 30,
   },
-  text:{
-    color: '#557BF1',
-    fontWeight: 'bold',
-    fontSize: 16
-  }
+  text: {
+    color: "#557BF1",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
 });
