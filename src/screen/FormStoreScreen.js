@@ -27,15 +27,12 @@ export default function FormStoreScreen(props) {
         validationSchema: Yup.object(validationSchema()),
         validateOnChange: false,
         onSubmit: async (formData) => {
-            console.log(formData);
             setError("");
         
-            console.log("DATOS CORRECTOS");
             const objStore = {
                 name_store: formData.storeName,
                 description: formData.storeDescription
             }
-            console.log(objStore);
 
             if(dataStore != undefined) {
                 updateStore(objStore);
@@ -52,20 +49,15 @@ export default function FormStoreScreen(props) {
      * @param {Object} dataStore - objeto con los datos de la tienda
      */
     const saveStore = async (dataStore) => {
-        console.log("ENTRY SAVE");
-        console.log(dataStore);
         try {
             await addDoc(collection(db, 'Tiendas'), dataStore)
             .then(result => {
-                console.log("STORE SAVED");
                 navigation.goBack();
             })
             .catch(error => {
-                console.log("ERROR STORE SAVED");
                 console.log(error);
             })
         } catch (error) {
-            console.log("ERROR SAVE STORE");
             console.log(error);
         }
     }
@@ -83,11 +75,9 @@ export default function FormStoreScreen(props) {
 
         await updateDoc(docRef, dataStore)
         .then(result => {
-            console.log("Documents updated");
             navigation.goBack();
         })
         .catch(error => {
-            console.log("ERROR UPDATED STORE");
             console.log(error);
         })
     }
