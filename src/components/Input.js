@@ -6,9 +6,15 @@ import {colors} from '../styles/colors';
 
 const Input = props => {
   const [sec, setSec] = useState(props.secureTextEntry);
+  const [iconSecurity, setIconSecurity] = useState('eye');
 
   const handlePress = () => {
     setSec(!sec);
+    if(iconSecurity ==  'eye'){
+      setIconSecurity('eye-off');
+    }else{
+      setIconSecurity('eye');
+    }
   };
 
   return (
@@ -17,7 +23,7 @@ const Input = props => {
         style={inputStyles.input}
         underlineColorAndroid="transparent"
         {...props}
-
+        value={props.value}
         secureTextEntry={sec}
         placeholder={props.placeholderText}
         defaultValue={props.defaultValue}
@@ -30,7 +36,7 @@ const Input = props => {
       />
       {props.secureTextEntry && (
         <Pressable onPress={handlePress} style={inputStyles.touchable}>
-          <Ionicons name="eye" size={24} color={colors.primary} />
+          <Ionicons name={iconSecurity} size={24} color={colors.primary} />
         </Pressable>
       )}
 

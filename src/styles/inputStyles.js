@@ -2,7 +2,6 @@ import { StyleSheet } from "react-native";
 import { colors } from "./colors";
 export const inputStyles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: "row",
     marginTop: 10,
     marginBottom: 5,
