@@ -35,8 +35,6 @@ export default function LoginForm(props) {
   const { navigation } = props;
   const [error, setError] = useState("");
 
-  const { login } = useAuth();
-
   const formik = useFormik({
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),

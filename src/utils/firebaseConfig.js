@@ -15,21 +15,9 @@ const firebaseConfig = {
   };
   
 
-// Inicializar Firebase
-  firebase.initializeApp(firebaseConfig);
-
-
-// Opcional: Configurar los servicios específicos que desees utilizar
-// Por ejemplo, puedes habilitar Firebase Authentication, Firebase Realtime Database, Firebase Cloud Firestore, etc.
-
-// Ejemplo de uso de Firebase Authentication
-const auth = firebase.auth();
-// Ejemplo de uso de Firebase Realtime Database
-const database = firebase.database();
-// Ejemplo de uso de Firebase Cloud Firestore
-const firestore = firebase.firestore();
-// Ejemplo de uso de Firebase Storage
-const storage = firebase.storage();
-
-export { firebase, auth, database, firestore, storage };
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  
+  export { firebase };
 
