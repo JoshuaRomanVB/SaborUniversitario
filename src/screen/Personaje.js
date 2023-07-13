@@ -52,7 +52,7 @@ export default function Personaje({ route }) {
 
   return (
     <ImageBackground
-      source={require("../assets/background.jpg")} // Ruta de la imagen de fondo
+      source={require("../assets/images/background.jpg")} // Ruta de la imagen de fondo
       style={styles.background}
     >
       <View style={styles.container}>
@@ -65,7 +65,7 @@ export default function Personaje({ route }) {
               return (
                 <View style={styles.backgroundplanetsContainer}>
                 <ImageBackground
-                  source={require("../assets/planets.jpg")} // Ruta de la imagen de fondo
+                  source={require("../assets/images/planets.jpg")} // Ruta de la imagen de fondo
                   style={styles.backgroundplanets}
                 >
                   <View style={styles.locationContainer}>

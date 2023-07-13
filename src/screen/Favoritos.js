@@ -68,7 +68,7 @@ export default function Favoritos({ navigation }) {
 
       <View style={styles.listContainer}>
       <ImageBackground
-      source={require("../assets/background.jpg")} // Ruta de la imagen de fondo
+      source={require("../assets/images/background.jpg")} // Ruta de la imagen de fondo
       style={styles.background}
     >
     {!auth ?(

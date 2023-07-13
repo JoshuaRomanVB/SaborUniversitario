@@ -57,7 +57,7 @@ export default function Navigation() {
 const renderIconRM = () => {
   return (
     <Image
-      source={require("../assets/iconoram.png")}
+      source={require("../assets/images/iconoram.png")}
       style={{ width: 75, height: 75, top: -20 }}
     />
   );

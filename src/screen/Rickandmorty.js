@@ -5,7 +5,7 @@ import RickandmortyApi from "../api/RickandmortyApi";
 export default function Rickandmorty({ navigation }) {
   return (
     <ImageBackground
-      source={require('../assets/background.jpg')} // Ruta de la imagen de fondo
+      source={require('../assets/images/background.jpg')} // Ruta de la imagen de fondo
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>

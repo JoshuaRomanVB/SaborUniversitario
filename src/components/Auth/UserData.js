@@ -7,13 +7,13 @@ export default function UserData() {
   const{auth,logout} = useAuth()
   return (
       <ImageBackground
-        source={require('../../assets/background.jpg')}
+        source={require('../../assets/images/background.jpg')}
         style={styles.backgroundImage}
       >
         <View style={styles.contentContainer}>
           <View style={styles.circleContainer}>
             <Image
-              source={require('../../assets/profile.png')}
+              source={require('../../assets/images/profile.png')}
               style={styles.profileImage}
             />
           </View>

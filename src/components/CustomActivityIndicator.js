@@ -20,7 +20,7 @@ const CustomActivityIndicator = () => {
     return (
       <View style={styles.container}>
         <Animated.Image
-          source={require('../assets/portal.png')}
+          source={require('../assets/images/portal.png')}
           style={[styles.image, { transform: [{ rotate: spin }] }]}
         />
       </View>

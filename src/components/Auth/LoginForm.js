@@ -19,8 +19,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { userDetails, user } from "../../utils/userDB";
 import CustomButton from "../CustomButton";
-import {getAuth, signInWithEmailAndPassword} from 'firebase/auth'
-import { app } from "../../utils/firebaseConfig";
+
 
 /**
 Componente de formulario de inicio de sesión
@@ -35,8 +34,7 @@ export default function LoginForm(props) {
   const { navigation } = props;
   const [error, setError] = useState("");
 
-
-  const auth = getAuth(app);
+ 
 
   const formik = useFormik({
     initialValues: initialValues(),
@@ -47,7 +45,7 @@ export default function LoginForm(props) {
       const { username, password } = formData;
 
       try {
-      signInWithEmailAndPassword(auth,username, password)
+        signInWithEmailAndPassword(auth, username, password)
           .then((userCredential) => {
             // Acceso exitoso
             navigation.navigate("Tabs");
@@ -91,20 +89,30 @@ Función para establecer el esquema de validación del formulario.
     };
   }
 
+  function irACrearCuenta(){
+    navigation.navigate('CreateCuenta');
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/backgroudLogin.png")}
-        style={styles.image} // Establece el color del borde de la imagen
+        source={require("../../assets/images/backgroundLogin.png")}
+        style={styles.image}
       >
-        <Text style={styles.title}>Bienvenido de nuevo</Text>
+        <View style={styles.overlay}>
+          <Text style={styles.titleH}>Sabor Universitario</Text>
+        </View>
       </ImageBackground>
+
+      <View style={styles.containerForm}>
+        {/* Resto del contenido del formulario */}
+      </View>
 
       <View style={styles.containerForm}>
         <Text style={styles.title}>Bienvenido de nuevo</Text>
         <Text style={styles.text}>Email</Text>
         <TextInput
-          placeholder={"Correo"} // Corrección: placeholder en lugar de placehorder
+          placeholder={"Ingrese su correo electronico"} // Corrección: placeholder en lugar de placehorder
           placeholderTextColor="#C9C9C9"
           style={styles.input}
           autoCapitalize="none"
@@ -114,7 +122,7 @@ Función para establecer el esquema de validación del formulario.
         <Text style={styles.error}>{formik.errors.username}</Text>
         <Text style={styles.text}>Contraseña</Text>
         <TextInput
-          placeholder={"Contraseña"} // Corrección: placeholder en lugar de placehorder
+          placeholder={"Ingrese su contraseña"} // Corrección: placeholder en lugar de placehorder
           placeholderTextColor="#C9C9C9"
           style={styles.input}
           autoCapitalize="none"
@@ -123,23 +131,19 @@ Función para establecer el esquema de validación del formulario.
           onChangeText={(text) => formik.setFieldValue("password", text)}
         />
         <Text style={styles.error}>{formik.errors.password}</Text>
-        <CustomButton
-          title="¿Olvidaste tu contraseña?"
-          onPress={formik.handleSubmit}
-        />
+        <TouchableOpacity>
+          <Text style={styles.olvide}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
         <CustomButton title="Iniciar sesión" onPress={formik.handleSubmit} />
         <Text style={styles.error}>{error}</Text>
-
-        <Text>
-          ¿No tienes una cuenta?{" "}
-          <TouchableOpacity>
-            <Text
-              style={{ fontWeight: "bold", textDecorationLine: "underline" }}
-            >
-              Registrate
+        <View style={styles.signupContainer}>
+          <TouchableOpacity onPress={irACrearCuenta}>
+            <Text style={styles.signupText}>
+              ¿No tienes una cuenta?{" "}
+              <Text style={styles.signupLink}>Registrate qquí</Text>
             </Text>
           </TouchableOpacity>
-        </Text>
+        </View>
       </View>
     </View>
   );
@@ -170,16 +174,10 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   background: {
-    height: "100%",
+    height: "50%",
     alignContent: "center",
     justifyContent: "center",
   },
-  image: {
-    height: 520,
-    width: "100%",
-    alignSelf: "center",
-  },
-
   container: {
     flex: 1,
   },
@@ -195,7 +193,7 @@ const styles = StyleSheet.create({
     height: 500,
   },
   title: {
-    marginTop: 20,
+    marginVertical: 20,
     color: "#557BF1",
     fontWeight: "bold",
     textAlign: "center",
@@ -205,5 +203,51 @@ const styles = StyleSheet.create({
     color: "#557BF1",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  imageContainer: {
+    position: "relative",
+    flex: 1,
+  },
+  image: {
+    flex: 1,
+    resizeMode: "cover",
+  },
+  textContainer: {
+    position: "absolute",
+    top: 50,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+  },
+  titleH: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 50,
+    marginTop: 80,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+  },
+
+  signupContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  signupText: {
+    textAlign: "center",
+  },
+  signupLink: {
+    fontWeight: "bold",
+    color: "#557BF1",
+  },
+  olvide: {
+    marginVertical: 10,
+    fontWeight: "bold",
+    color: "#557BF1",
+    textAlign: 'right'
   },
 });

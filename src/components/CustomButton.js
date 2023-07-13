@@ -11,8 +11,8 @@ export default function CustomButton({ title, onPress }) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#1dadc0', // Cambia aquí el color de fondo deseado
-    borderRadius: 10,
+    backgroundColor: '#557BF1', // Cambia aquí el color de fondo deseado
+    borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginHorizontal: 50,
