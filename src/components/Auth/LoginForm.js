@@ -20,7 +20,7 @@ import * as Yup from "yup";
 import { userDetails, user } from "../../utils/userDB";
 import CustomButton from "../CustomButton";
 import {getAuth, signInWithEmailAndPassword} from 'firebase/auth'
-import app from "../../utils/firebaseConfig";
+import { app } from "../../utils/firebaseConfig";
 
 /**
 Componente de formulario de inicio de sesión

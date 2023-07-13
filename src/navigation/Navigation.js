@@ -9,6 +9,7 @@ import NavigationAccount from "./NavigationAccount";
 import NavigationFavoritos from "./NavigationFavoritos";
 import RickandmortyApi from "../api/RickandmortyApi";
 import NavigationPersonaje from "./NavigationPersonaje";
+import NavigationHome from "./NavigationHome";
 
 export default function Navigation() {
   const Tab = createBottomTabNavigator();
@@ -31,7 +32,7 @@ export default function Navigation() {
 
           if (route.name === "account") {
             iconName = "user";
-          } else if (route.name === "rickandmorty") {
+          } else if (route.name === "home") {
             return renderIconRM();
           } else if (route.name === "favoritos") {
             iconName = "heart";
@@ -47,7 +48,7 @@ export default function Navigation() {
       )}
     >
       <Tab.Screen name="account" component={NavigationAccount} options={{ tabBarLabel: "Mi cuenta" }} />
-      <Tab.Screen name="rickandmorty" component={NavigationPersonaje} options={{ tabBarLabel: "" }} />
+      <Tab.Screen name="home" component={NavigationHome} options={{ tabBarLabel: "" }} />
       <Tab.Screen name="favoritos" component={NavigationFavoritos} options={{ tabBarLabel: "Favoritos" }} />
     </Tab.Navigator>
   );
