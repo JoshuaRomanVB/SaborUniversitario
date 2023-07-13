@@ -1,23 +1,21 @@
 import React from "react";
-import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
 
 /**
  * 
- * @param {String} handleNavigate - Pantalla a la que se va a navegar 
- * @param {String} screenCalled - Pantalla donde se llama al boton
+ * @param {Function Callback} handleNavigateTo - Función para navegar a otra screen 
+ * @param {String} screenCalled - Pantalla donde se llama al botón
  * @returns 
  */
-export default function FloatButton ( { handleNavigate, screenCalled } ) {
-    const navigation = useNavigation();
+export default function FloatButton ( { handleNavigateTo, screenCalled } ) {
     const backgroundColor = screenCalled === 'home' ? "#FF773D" : "#f88";
     const plusColor = screenCalled === 'home' ? "#fff" : "#000";
     
     return (
         <TouchableOpacity
             style={{...styles.button, backgroundColor: backgroundColor}}
-            onPress={() => navigation.navigate(handleNavigate)}
+            onPress={() => handleNavigateTo()}
         >
             <AntDesign name="plus" size={24} color={plusColor} />
         </TouchableOpacity>

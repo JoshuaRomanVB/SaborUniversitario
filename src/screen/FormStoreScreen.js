@@ -6,15 +6,20 @@ import * as Yup from "yup";
 import CustomButton from '../components/CustomButton';
 import useAuth from '../hooks/useAuth';
 import { db } from '../utils/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 
-export default function FormStoreScreen() {
+export default function FormStoreScreen(props) {
+
+    const dataStore = props.route.params.dataStore;
+    const id_store = dataStore === undefined ? undefined : dataStore.id_store;
+    const name_store = dataStore === undefined ? undefined : dataStore.name_store;
+    const  description = dataStore === undefined ? undefined : dataStore.description;
+    
 
     const navigation = useNavigation();
     const { auth } = useAuth();
     const [error, setError] = useState("");
-    console.log(auth);
 
     // Validación de formulario
     const formik = useFormik({
@@ -26,28 +31,65 @@ export default function FormStoreScreen() {
             setError("");
         
             console.log("DATOS CORRECTOS");
-            const dataStore = {
+            const objStore = {
                 name_store: formData.storeName,
                 description: formData.storeDescription
             }
-            saveStore(dataStore);
+            console.log(objStore);
+
+            if(dataStore != undefined) {
+                updateStore(objStore);
+            }else {
+                saveStore(objStore);
+            }
             
         },
     });
+
 
     /**
      * Función para guardar en la base de datos la tienda
      * @param {Object} dataStore - objeto con los datos de la tienda
      */
     const saveStore = async (dataStore) => {
-
+        console.log("ENTRY SAVE");
+        console.log(dataStore);
         try {
-            await addDoc(collection(db, 'Tiendas'), dataStore);
-            navigation.goBack();
+            await addDoc(collection(db, 'Tiendas'), dataStore)
+            .then(result => {
+                console.log("STORE SAVED");
+                navigation.goBack();
+            })
+            .catch(error => {
+                console.log("ERROR STORE SAVED");
+                console.log(error);
+            })
         } catch (error) {
             console.log("ERROR SAVE STORE");
             console.log(error);
         }
+    }
+
+    /**
+     * Función para actualizar tienda en la base de datos
+     * @date 7/13/2023 - 8:53:55 AM
+     * @author Alessandro Guevara
+     *
+     * @async
+     * @param {Object} dataStore - objeto con los datos de la tienda
+     */
+    const updateStore = async (dataStore) => {
+        const docRef = doc(db, "Tiendas", id_store);
+
+        await updateDoc(docRef, dataStore)
+        .then(result => {
+            console.log("Documents updated");
+            navigation.goBack();
+        })
+        .catch(error => {
+            console.log("ERROR UPDATED STORE");
+            console.log(error);
+        })
     }
 
     /**
@@ -56,8 +98,8 @@ export default function FormStoreScreen() {
      */
     function initialValues() {
         return {
-            storeName: "",
-            storeDescription: "",
+            storeName: name_store != undefined ? name_store : "",
+            storeDescription: description != undefined ? description : "",
         };
     }
 
@@ -76,7 +118,7 @@ export default function FormStoreScreen() {
         <SafeAreaView style={styles.container}>
             <ScrollView style={{backgroundColor: '#fff'}}>
                 <View style={styles.screenTop}>
-                    <Text>Crear tienda</Text>
+                    <Text>{name_store != undefined ? `Actualizar tienda: ${name_store}` : "Crear tienda"} </Text>
                 </View>
                 <View style={styles.screenContent}>
                     <Text style={styles.text}>Nombre de tienda</Text>
@@ -101,7 +143,7 @@ export default function FormStoreScreen() {
                     />
                     <Text style={styles.error}>{formik.errors.storeDescription}</Text>
 
-                    <CustomButton title={'Guardar'} onPress={formik.handleSubmit}/>
+                    <CustomButton title={dataStore != undefined ? 'Actualizar' : 'Guardar'} onPress={formik.handleSubmit}/>
                 </View>
             </ScrollView>
         </SafeAreaView>
