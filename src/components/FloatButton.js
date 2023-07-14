@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
+import { colors } from "../styles/colors";
 
 /**
  * 
@@ -9,7 +10,7 @@ import { AntDesign } from '@expo/vector-icons';
  * @returns 
  */
 export default function FloatButton ( { handleNavigateTo, screenCalled } ) {
-    const backgroundColor = screenCalled === 'home' ? "#FF773D" : "#f88";
+    const backgroundColor = screenCalled === 'home' ? colors.primary : screenCalled === "products" ? colors.primary : "#f88";
     const plusColor = screenCalled === 'home' ? "#fff" : "#000";
     
     return (

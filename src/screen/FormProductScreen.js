@@ -16,14 +16,15 @@ import * as ImagePicker from "expo-image-picker";
 import { color } from 'react-native-reanimated';
 
 
-export default function FormStoreScreen(props) {
+export default function FormProductScreen(props) {
 
-    const dataStore = props.route.params.dataStore;
-    const id_store = dataStore === undefined ? undefined : dataStore.id_store;
-    const name_store = dataStore === undefined ? undefined : dataStore.name_store;
-    const description = dataStore === undefined ? undefined : dataStore.description;
-    const image_url = dataStore === undefined ? "" : dataStore.image_url;
-    const school_store = dataStore === undefined ? "" : dataStore.school_store;
+    const dataProduct = props.route.params.dataProduct;
+    const id_store = props.route.params.id_store;
+    const name_store = props.route.params.name_store;
+    const id_product = dataProduct === undefined ? undefined : dataProduct.id_product;
+    const name_product = dataProduct === undefined ? undefined : dataProduct.name_product;
+    const price = dataProduct === undefined ? undefined : dataProduct.price;
+    const image_url = dataProduct === undefined ? "" : dataProduct.image_url;
 
     const navigation = useNavigation();
     const { auth } = useAuth();
@@ -61,20 +62,19 @@ export default function FormStoreScreen(props) {
                 // 1 = Imagen subida
                 // 2 = No se selecciono una imagen, asi que no se sube imagen
                 if(result.status === 1 || result.status === 2) {
-                    const urlImage = result.status === 1 ? result.download_url : dataStore === undefined ? "" : image_url;
+                    const urlImage = result.status === 1 ? result.download_url : dataProduct === undefined ? "" : image_url;
                     const objStore = {
-                        id_user: id_user,
-                        name_user: name_user,
-                        name_store: formData.storeName,
-                        description: formData.storeDescription,
-                        school_store: formData.schoolStore,
+                        id_store: id_store,
+                        name_store: name_store,
+                        name_product: formData.productName,
+                        price: formData.productPrice,
                         image_url: urlImage,
                         estatus: 1
                     }
-                    if(dataStore != undefined) {
-                        updateStore(objStore);
+                    if(dataProduct != undefined) {
+                        updateProduct(objStore);
                     }else {
-                        saveStore(objStore);
+                        saveProduct(objStore);
                     }
                 }
             })
@@ -86,11 +86,11 @@ export default function FormStoreScreen(props) {
 
     /**
      * Función para guardar en la base de datos la tienda
-     * @param {Object} dataStore - objeto con los datos de la tienda
+     * @param {Object} dataProduct - objeto con los datos de la tienda
      */
-    const saveStore = async (dataStore) => {
+    const saveProduct = async (dataProduct) => {
         try {
-            await addDoc(collection(db, 'Tiendas'), dataStore)
+            await addDoc(collection(db, 'Productos'), dataProduct)
             .then(result => {
                 navigation.goBack();
             })
@@ -108,12 +108,12 @@ export default function FormStoreScreen(props) {
      * @author Alessandro Guevara
      *
      * @async
-     * @param {Object} dataStore - objeto con los datos de la tienda
+     * @param {Object} dataProduct - objeto con los datos de la tienda
      */
-    const updateStore = async (dataStore) => {
-        const docRef = doc(db, "Tiendas", id_store);
+    const updateProduct = async (dataProduct) => {
+        const docRef = doc(db, "Productos", id_product);
 
-        await updateDoc(docRef, dataStore)
+        await updateDoc(docRef, dataProduct)
         .then(result => {
             navigation.goBack();
         })
@@ -133,14 +133,14 @@ export default function FormStoreScreen(props) {
         setParamsAlert({
             ...paramsAlert,
             showAlertProgress: true,
-            showAlertTittle: "Eliminar tienda",
-            showAlertMessage: "¿Estás seguro que deseas eliminar la tienda?"
+            showAlertTittle: "Eliminar producto",
+            showAlertMessage: "¿Estás seguro que deseas eliminar el producto?"
         })
-        const docRef = doc(db, 'Tiendas', id_store);
+        const docRef = doc(db, 'Productos', id_product);
 
         await deleteDoc(docRef)
             .then((result) => {
-                console.log("STORE DELETED");
+                console.log("PRODUCT DELETED");
                 setParamsAlert({
                     ...paramsAlert,
                     showAlert: false,
@@ -149,12 +149,12 @@ export default function FormStoreScreen(props) {
                 navigation.goBack();
             })
             .catch((error) => {
-                console.log("ERROR STORE DELETED");
+                console.log("ERROR PRODUCT DELETED");
                 setParamsAlert({
                     ...paramsAlert,
                     showAlertProgress: false,
                     showAlertMessage: 'Ocurrió un error',
-                    showAlertTittle: 'No se pudo eliminar la tienda'
+                    showAlertTittle: 'No se pudo eliminar el producto'
                 })
             })
     }   
@@ -225,7 +225,7 @@ export default function FormStoreScreen(props) {
                         textBtnConfirm: 'Aceptar',
                         showButtonCancel: false,
                         textBtnCancel: 'Cancelar',
-                        showAlertTittle: "Guardando tienda",
+                        showAlertTittle: "Guardando producto",
                         showAlertMessage: "Por favor espera un momento"
                     });
                     // Verificar si hay una imagen seleccionada para subir
@@ -234,7 +234,7 @@ export default function FormStoreScreen(props) {
                     if (fileBlob && fileName) {
 
                         // Crear una referencia al archivo en Firebase Storage
-                        const filePath = `storesImages/${fileName}`;
+                        const filePath = `productsImages/${fileName}`;
                         const storageRef = ref(storage, filePath);
                 
                         // Subir el blob al Firebase Storage
@@ -299,7 +299,7 @@ export default function FormStoreScreen(props) {
                         resolve(objResp);
                     }
                 }else {
-                    if(dataStore === undefined) {
+                    if(dataProduct === undefined) {
                         setParamsAlert({
                             ...paramsAlert,
                             showAlert: true,
@@ -313,7 +313,7 @@ export default function FormStoreScreen(props) {
                         });
                     }
                     const objResp ={
-                        status: dataStore === undefined ? 0 : 2,
+                        status: dataProduct === undefined ? 0 : 2,
                     }
                     resolve(objResp);
                 }
@@ -346,9 +346,8 @@ export default function FormStoreScreen(props) {
      */
     function initialValues() {
         return {
-            storeName: name_store != undefined ? name_store : "",
-            storeDescription: description != undefined ? description : "",
-            schoolStore: school_store != undefined ? school_store : ""
+            productName: name_product != undefined ? name_product : "",
+            productPrice: price != undefined ? price : "",
         };
     }
 
@@ -358,9 +357,8 @@ export default function FormStoreScreen(props) {
      */
     function validationSchema() {
         return {
-            storeName: Yup.string().required("EL nombre de tienda es obligatorio."),
-            storeDescription: Yup.string().required("La descripción de tienda es obligatoria"),
-            schoolStore: Yup.string().required("La escuela es obligatoria").max(6, "Escribe un máximo de 6 letras").min(3, "Escribe un mínimo de 3 letras")
+            productName: Yup.string().required("EL nombre de producto es obligatorio."),
+            productPrice: Yup.number('El precio debe de ser numérico').required("El precio es obligatorio").positive('El precio debe de ser un número positivo'),
         };
     }
 
@@ -381,35 +379,27 @@ export default function FormStoreScreen(props) {
         <SafeAreaView style={styles.container}>
             <ScrollView style={{backgroundColor: '#fff'}}>
                 <View style={styles.screenTop}>
-                    <Text style={styles.textTitle}>{name_store != undefined ? `Actualizar tienda: ${name_store}` : "Crear tienda"} </Text>
+                    <Text style={styles.textTitle}>{name_product != undefined ? `Actualizar producto: ${name_product}` : "Crear producto"} </Text>
                 </View>
                 <View style={styles.screenContent}>
-                    <Text style={styles.text}>Nombre de tienda</Text>
+                    <Text style={styles.text}>Nombre producto</Text>
                     <Input
                         placeholderText="Escribe un nombre"
-                        value={formik.values.storeName}
+                        value={formik.values.productName}
                         iconName="document-text"
-                        onChangeText={(text) => formik.setFieldValue("storeName", text)}
+                        onChangeText={(text) => formik.setFieldValue("productName", text)}
                     />
-                    <Text style={styles.error}>{formik.errors.storeName}</Text>
+                    <Text style={styles.error}>{formik.errors.productName}</Text>
 
-                    <Text style={styles.text}>Descripción</Text>
+                    <Text style={styles.text}>Precio</Text>
                     <Input
-                        placeholderText="Escribe una descripción de la tienda"
-                        value={formik.values.storeDescription}
+                        placeholderText="Escribe un precio"
+                        value={formik.values.productPrice}
                         iconName="copy"
-                        onChangeText={(text) => formik.setFieldValue("storeDescription", text)}
+                        onChangeText={(text) => formik.setFieldValue("productPrice", text)}
                     />
-                    <Text style={styles.error}>{formik.errors.storeDescription}</Text>
+                    <Text style={styles.error}>{formik.errors.productPrice}</Text>
 
-                    <Text style={styles.text}>Escuela</Text>
-                    <Input
-                        placeholderText="Escribe las iniciales de la escuela"
-                        value={formik.values.schoolStore}
-                        iconName="copy"
-                        onChangeText={(text) => formik.setFieldValue("schoolStore", text)}
-                    />
-                    <Text style={styles.error}>{formik.errors.schoolStore}</Text>
 
                     <Text style={styles.text}>Imagen de portada</Text>
                     {imageUri && (
@@ -425,12 +415,12 @@ export default function FormStoreScreen(props) {
                     </View>
 
                     <View style={styles.contentBtnOption}>
-                        <CustomButton title={dataStore != undefined ? 'Actualizar tienda' : 'Guardar'} onPress={formik.handleSubmit}/>
+                        <CustomButton title={dataProduct != undefined ? 'Actualizar producto' : 'Guardar'} onPress={formik.handleSubmit}/>
                     </View>
                     
-                    {dataStore != undefined && (
+                    {dataProduct != undefined && (
                         <View style={styles.contentBtnOption}>
-                            <CustomButton title={'Eliminar tienda'} onPress={() => handlePressDelete()}/>
+                            <CustomButton title={'Eliminar producto'} onPress={() => handlePressDelete()}/>
                         </View>
                     )}
                     

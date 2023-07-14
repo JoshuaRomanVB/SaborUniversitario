@@ -4,11 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../styles/colors';
 import { Entypo } from '@expo/vector-icons';
 
-export default function StoreCard({dataStore}) {
+export default function ProductCard({dataProduct}) {
 
     const navigation = useNavigation();
 
-    const { id_store, name_store, name_user, image_url, school_store } = dataStore;
+    const { name_product, id_store, name_store, image_url, price  } = dataProduct;
+    
 
     /**
      * Función para redireccionar a la screen del formulario de tienda
@@ -19,8 +20,10 @@ export default function StoreCard({dataStore}) {
         // navigation.navigate('FormStore', {
         //     dataStore: dataStore
         // });
-        navigation.navigate('Products', {
-            dataStore: dataStore,
+        navigation.navigate('FormProduct', {
+            dataProduct: dataProduct,
+            id_store: id_store,
+            name_store: name_store
         });
     }
 
@@ -34,12 +37,11 @@ export default function StoreCard({dataStore}) {
             </View>
             <View style={styles.containerInfo}>
                 <View style={{flex: 0.8}}>
-                    <Text style={styles.textTitle}>{name_store}</Text>
-                    <Text style={styles.textSubTitle}>{name_user}</Text>
+                    <Text style={styles.textTitle}>{name_product}</Text>
+                    <Text style={styles.textSubTitle}>{name_store}</Text>
                 </View>
                 <View style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
-                    <Entypo name="location" size={30} color={colors.primary} />
-                    <Text style={styles.textSubTitle}>{school_store}</Text>
+                    <Text style={styles.textTitle}>${price}</Text>
                 </View>
 
             </View>
