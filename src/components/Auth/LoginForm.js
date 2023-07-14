@@ -58,6 +58,7 @@ export default function LoginForm(props) {
           .catch((error) => {
             // Error de autenticación
             console.log(error);
+            setError("Usuario o contraseña incorrecta");
           });
 
         // Aquí puedes redirigir al usuario a la pantalla de inicio o hacer cualquier otra acción necesaria después del inicio de sesión exitoso.
@@ -87,7 +88,7 @@ Función para establecer el esquema de validación del formulario.
 */
   function validationSchema() {
     return {
-      username: Yup.string().required("El nombre de usuario es obligatorio"),
+      password: Yup.string().required("El nombre de usuario es obligatorio"),
       email: Yup.string().required("El correo electrónico es obligatorio").email("El correo electrónico no es válido"),
     };
   }
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
     color: "#557BF1",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 30,
+    fontSize: 20,
   },
   text: {
     paddingHorizontal: 20,

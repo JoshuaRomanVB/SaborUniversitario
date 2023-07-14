@@ -3,7 +3,7 @@ import { colors } from './colors';
 export const ButtonTextStyle = StyleSheet.create({
     
     buttonText:{
-        color: colors.blue,
+        color: colors.primary,
         textAlign:'center',
         fontSize: 16,
         marginVertical:10,

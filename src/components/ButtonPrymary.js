@@ -17,7 +17,7 @@ const ButtonPrymary = props => {
 
   return (
     <Pressable onPress={onPress}>
-      <View style={globalstyles.container}>
+      <View style={globalstyles.containerB}>
         <LinearGradient
           // Button Linear Gradient
           colors={['#4478A0', '#66D0C2']}

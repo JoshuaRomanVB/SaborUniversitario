@@ -1,5 +1,4 @@
 import React from 'react';
-import LinearGradient from 'react-native-linear-gradient';
 import {ButtonTextStyle} from '../styles/buttonTextStyle';
 import {
   Image,

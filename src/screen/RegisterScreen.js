@@ -4,7 +4,7 @@ import { typography } from "../styles/typography";
 import { Ionicons } from "@expo/vector-icons";
 
 import {
-  Image,
+  ImageBackground,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,15 +12,18 @@ import {
   View,
   Text,
   Button,
+  Image, // Importa solo el componente Image de react-native
 } from "react-native";
 import { registerStyles } from "../styles/Screens/registerStyles";
 import Input from "../components/Input";
 import ButtonPrymary from "../components/ButtonPrymary";
+import ButtonText from "../components/ButtonText";
 import { colors } from "../styles/colors";
 import AwesomeAlert from "react-native-awesome-alerts";
 import * as ImagePicker from "expo-image-picker";
 import { db } from "../utils/firebaseConfig";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
+import { storage } from '../utils/firebaseConfig';
 
 const RegisterScreen = ({ navigation }) => {
   //Alert dialog
@@ -33,19 +36,13 @@ const RegisterScreen = ({ navigation }) => {
   const [responseExitoso, setResponseExitoso] = useState(false);
 
   const [name, setName] = useState("");
-  const [appat, setAppat] = useState("");
-  const [apmat, setApmat] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordval, setPasswordval] = useState("");
   const [imageUri, setImageUri] = useState("");
 
   const [nameError, setNameError] = useState("");
-  const [appatError, setAppatError] = useState("");
-  const [apmatError, setApmatError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [passwordvalError, setPasswordvalError] = useState("");
 
   const [fileBlob, setFileBlob] = useState("");
   const [fileName, setFileName] = useState("");
@@ -63,22 +60,6 @@ const RegisterScreen = ({ navigation }) => {
       isValid = false;
     } else {
       setNameError("");
-    }
-
-    // Validar apellido paterno
-    if (!appat) {
-      setAppatError("Por favor ingrese su apellido paterno");
-      isValid = false;
-    } else {
-      setAppatError("");
-    }
-
-    // Validar apellido materno
-    if (!apmat) {
-      setApmatError("Por favor ingrese su apellido materno");
-      isValid = false;
-    } else {
-      setApmatError("");
     }
 
     // Validar correo electrónico
@@ -99,20 +80,21 @@ const RegisterScreen = ({ navigation }) => {
     } else if (password.length < 6) {
       setPasswordError("La contraseña debe tener al menos 6 caracteres");
       isValid = false;
+    } else if (!/\d/.test(password)) {
+      setPasswordError("La contraseña debe contener al menos un número");
+      isValid = false;
+    } else if (!/[!@#$%^&*]/.test(password)) {
+      setPasswordError("La contraseña debe contener al menos un símbolo");
+      isValid = false;
+    } else if (!/[A-Z]/.test(password)) {
+      setPasswordError(
+        "La contraseña debe contener al menos una letra mayúscula"
+      );
+      isValid = false;
     } else {
       setPasswordError("");
     }
 
-    // Validar confirmación de contraseña
-    if (!passwordval) {
-      setPasswordvalError("Por favor ingrese la confirmación de contraseña");
-      isValid = false;
-    } else if (password !== passwordval) {
-      setPasswordvalError("Las contraseñas no coinciden");
-      isValid = false;
-    } else {
-      setPasswordvalError("");
-    }
     return isValid;
   };
 
@@ -122,6 +104,10 @@ const RegisterScreen = ({ navigation }) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
+
+  function irALogin() {
+    navigation.navigate("Login");
+  }
 
   const handleChooseImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -166,7 +152,7 @@ const RegisterScreen = ({ navigation }) => {
       // Verificar si hay una imagen seleccionada para subir
       if (fileBlob && fileName) {
         // Crear una referencia al archivo en Firebase Storage
-        const storageRef = reference.child(fileName);
+        const storageRef = storage.ref(fileName);
 
         // Subir el blob al Firebase Storage
         const uploadTask = storageRef.put(fileBlob);
@@ -203,18 +189,6 @@ const RegisterScreen = ({ navigation }) => {
       setShowAlertTittle("Guardando usuario");
       setShowAlertMessage("Por favor espera...");
       try {
-        const response = await axios.post(
-          "https://keen-napier.68-168-208-58.plesk.page/api/Auth/Registro",
-          {
-            nombre: name,
-            apPat: appat,
-            apMat: apmat,
-            correo: email,
-            imagen: imageURL,
-            password: password,
-          }
-        );
-
         // Aquí puedes hacer algo con la respuesta, como guardar un token de acceso en el almacenamiento local o en el estado global.
         setShowAlertProgress(false);
         setShowButton(true);
@@ -225,10 +199,6 @@ const RegisterScreen = ({ navigation }) => {
         console.log(
           "nombre " +
             name +
-            "  apPat" +
-            appat +
-            "  apMat" +
-            apmat +
             "  email" +
             email +
             " pass " +
@@ -244,132 +214,96 @@ const RegisterScreen = ({ navigation }) => {
   };
   return (
     <SafeAreaView style={globalstyles.container}>
-      <ScrollView style={globalstyles.scroll}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View style={registerStyles.containerGoBack}>
-            <Ionicons name="arrow-back" size={24} color={colors.gray} />
-            <Text style={registerStyles.text2}>volver</Text>
+      <ImageBackground
+        source={require("../assets/images/backgroundLogin.png")}
+        style={registerStyles.imageback}
+      >
+        <View style={registerStyles.overlay}>
+          <Text style={registerStyles.titleH}>CREACIÓN DE CUENTA</Text>
+          <View style={registerStyles.imageContainer}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={registerStyles.image} />
+            ) : (
+              <Image
+                source={require("../assets/images/perfil.png")}
+                style={registerStyles.image}
+              />
+            )}
+            <TouchableOpacity
+              style={registerStyles.addButton}
+              onPress={handleChooseImage}
+            >
+              <Text style={registerStyles.addButtonText}>+</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-        <Text style={typography.heading1}>Crear cuenta</Text>
+        </View>
+      </ImageBackground>
 
-        <AwesomeAlert
-          show={showAlert}
-          title={showAlertTittle}
-          message={showAlertMessage}
-          showProgress={showAlertProgress}
-          progressColor={colors.primary}
-          progressSize={40}
-          closeOnHardwareBackPress={true}
-          closeOnTouchOutside={false}
-          showConfirmButton={showButton}
-          confirmText="Aceptar"
-          onConfirmPressed={() => {
-            setShowAlert(false);
-            if (responseExitoso) {
-              navigation.navigate("Login");
-            }
-          }}
-          confirmButtonStyle={{
-            backgroundColor: colors.blue,
-            width: 100,
-            alignItems: "center",
-            borderRadius: 30,
-          }}
-          contentContainerStyle={{ borderRadius: 30, marginHorizontal: 50 }}
-        />
+      <AwesomeAlert
+        show={showAlert}
+        title={showAlertTittle}
+        message={showAlertMessage}
+        showProgress={showAlertProgress}
+        progressColor={colors.primary}
+        progressSize={40}
+        closeOnHardwareBackPress={true}
+        closeOnTouchOutside={false}
+        showConfirmButton={showButton}
+        confirmText="Aceptar"
+        onConfirmPressed={() => {
+          setShowAlert(false);
+          if (responseExitoso) {
+            navigation.navigate("Login");
+          }
+        }}
+        confirmButtonStyle={{
+          backgroundColor: colors.blue,
+          width: 100,
+          alignItems: "center",
+          borderRadius: 30,
+        }}
+        contentContainerStyle={{ borderRadius: 30, marginHorizontal: 50 }}
+      />
 
-        <Text style={typography.caption}>
-          Introduce tus datos para poder crear una cuenta en Drug
+      <View style={registerStyles.containerForm}>
+        <Text style={registerStyles.title}>
+          EMPIEZA A DISFRUTAR DEL SABOR UNIVERSITARIO
         </Text>
-        <View style={registerStyles.imageContainer}>
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} style={registerStyles.image} />
-          ) : (
-            <Image
-              source={require("../assets/images/perfil.png")}
-              style={registerStyles.image}
-            />
-          )}
-          <TouchableOpacity
-            style={registerStyles.addButton}
-            onPress={handleChooseImage}
-          >
-            <Text style={registerStyles.addButtonText}>+</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={registerStyles.containerForm}>
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Nombre
-          </Text>
-          <Input
-            placeholderText="Nombre "
-            iconName="happy"
-            onChangeText={setName}
-          />
-          {nameError !== "" && (
-            <Text style={registerStyles.errorText}>{nameError}</Text>
-          )}
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Apellido Paterno
-          </Text>
-          <Input
-            placeholderText="Apellido paterno"
-            iconName="man"
-            onChangeText={setAppat}
-          />
-          {appatError !== "" && (
-            <Text style={registerStyles.errorText}>{appatError}</Text>
-          )}
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Apellido materno
-          </Text>
-          <Input
-            placeholderText="Apellido materno"
-            iconName="woman"
-            onChangeText={setApmat}
-          />
-          {apmatError !== "" && (
-            <Text style={registerStyles.errorText}>{apmatError}</Text>
-          )}
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Correo electronico
-          </Text>
-          <Input
-            placeholderText="Email"
-            iconName="mail"
-            onChangeText={setEmail}
-          />
-          {emailError !== "" && (
-            <Text style={registerStyles.errorText}>{emailError}</Text>
-          )}
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Contraseña
-          </Text>
-          <Input
-            placeholderText="Contraseña"
-            iconName="lock-closed"
-            secureTextEntry
-            onChangeText={setPassword}
-          />
-          {passwordError !== "" && (
-            <Text style={registerStyles.errorText}>{passwordError}</Text>
-          )}
-          <Text style={[typography.body, registerStyles.inputText]}>
-            Confirmar contraseña
-          </Text>
-          <Input
-            placeholderText="Confirmar contraseña"
-            iconName="lock-closed"
-            secureTextEntry
-            onChangeText={setPasswordval}
-          />
-          {passwordvalError !== "" && (
-            <Text style={registerStyles.errorText}>{passwordvalError}</Text>
-          )}
-          <ButtonPrymary onPress={handleUploadImage} text="Registrarme" />
-        </View>
-      </ScrollView>
+        <Text style={[typography.body, registerStyles.inputText]}>Nombre</Text>
+        <Input
+          placeholderText="Nombre "
+          iconName="happy"
+          onChangeText={setName}
+        />
+        {nameError !== "" && (
+          <Text style={registerStyles.errorText}>{nameError}</Text>
+        )}
+        <Text style={[typography.body, registerStyles.inputText]}>
+          Correo electronico
+        </Text>
+        <Input
+          placeholderText="Email"
+          iconName="mail"
+          onChangeText={setEmail}
+        />
+        {emailError !== "" && (
+          <Text style={registerStyles.errorText}>{emailError}</Text>
+        )}
+        <Text style={[typography.body, registerStyles.inputText]}>
+          Contraseña
+        </Text>
+        <Input
+          placeholderText="Contraseña"
+          iconName="lock-closed"
+          secureTextEntry
+          onChangeText={setPassword}
+        />
+        {passwordError !== "" && (
+          <Text style={registerStyles.errorText}>{passwordError}</Text>
+        )}
+        <ButtonPrymary onPress={handleUploadImage} text="Registrarme" />
+        <ButtonText onPress={irALogin} text="Ya tienes cuenta?  Inicia sesión aqui" />
+      </View>
     </SafeAreaView>
   );
 };
