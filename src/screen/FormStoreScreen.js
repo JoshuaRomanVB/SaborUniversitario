@@ -13,6 +13,7 @@ import Input from '../components/Input';
 import AwesomeAlert from "react-native-awesome-alerts";
 import { colors } from '../styles/colors';
 import * as ImagePicker from "expo-image-picker";
+import { color } from 'react-native-reanimated';
 
 
 export default function FormStoreScreen(props) {
@@ -22,9 +23,12 @@ export default function FormStoreScreen(props) {
     const name_store = dataStore === undefined ? undefined : dataStore.name_store;
     const description = dataStore === undefined ? undefined : dataStore.description;
     const image_url = dataStore === undefined ? "" : dataStore.image_url;
+    const school_store = dataStore === undefined ? "" : dataStore.school_store;
 
     const navigation = useNavigation();
     const { auth } = useAuth();
+    const { id_user, name_user } = auth;
+
     const [error, setError] = useState("");
     const [paramsAlert, setParamsAlert] = useState({
         showAlert: false,
@@ -59,8 +63,11 @@ export default function FormStoreScreen(props) {
                 if(result.status === 1 || result.status === 2) {
                     const urlImage = result.status === 1 ? result.download_url : dataStore === undefined ? "" : image_url;
                     const objStore = {
+                        id_user: id_user,
+                        name_user: name_user,
                         name_store: formData.storeName,
                         description: formData.storeDescription,
+                        school_store: formData.schoolStore,
                         image_url: urlImage,
                         estatus: 1
                     }
@@ -341,6 +348,7 @@ export default function FormStoreScreen(props) {
         return {
             storeName: name_store != undefined ? name_store : "",
             storeDescription: description != undefined ? description : "",
+            schoolStore: school_store != undefined ? school_store : ""
         };
     }
 
@@ -352,6 +360,7 @@ export default function FormStoreScreen(props) {
         return {
             storeName: Yup.string().required("EL nombre de tienda es obligatorio."),
             storeDescription: Yup.string().required("La descripción de tienda es obligatoria"),
+            schoolStore: Yup.string().required("La escuela es obligatoria").max(6, "Escribe un máximo de 6 letras").min(3, "Escribe un mínimo de 3 letras")
         };
     }
 
@@ -372,7 +381,7 @@ export default function FormStoreScreen(props) {
         <SafeAreaView style={styles.container}>
             <ScrollView style={{backgroundColor: '#fff'}}>
                 <View style={styles.screenTop}>
-                    <Text>{name_store != undefined ? `Actualizar tienda: ${name_store}` : "Crear tienda"} </Text>
+                    <Text style={styles.textTitle}>{name_store != undefined ? `Actualizar tienda: ${name_store}` : "Crear tienda"} </Text>
                 </View>
                 <View style={styles.screenContent}>
                     <Text style={styles.text}>Nombre de tienda</Text>
@@ -380,7 +389,6 @@ export default function FormStoreScreen(props) {
                         placeholderText="Escribe un nombre"
                         value={formik.values.storeName}
                         iconName="document-text"
-                        autoCapitalize="none"
                         onChangeText={(text) => formik.setFieldValue("storeName", text)}
                     />
                     <Text style={styles.error}>{formik.errors.storeName}</Text>
@@ -390,10 +398,18 @@ export default function FormStoreScreen(props) {
                         placeholderText="Escribe una descripción de la tienda"
                         value={formik.values.storeDescription}
                         iconName="copy"
-                        autoCapitalize="none"
                         onChangeText={(text) => formik.setFieldValue("storeDescription", text)}
                     />
                     <Text style={styles.error}>{formik.errors.storeDescription}</Text>
+
+                    <Text style={styles.text}>Escuela</Text>
+                    <Input
+                        placeholderText="Escribe las iniciales de la escuela"
+                        value={formik.values.schoolStore}
+                        iconName="copy"
+                        onChangeText={(text) => formik.setFieldValue("schoolStore", text)}
+                    />
+                    <Text style={styles.error}>{formik.errors.schoolStore}</Text>
 
                     <Text style={styles.text}>Imagen de portada</Text>
                     {imageUri && (
@@ -465,7 +481,7 @@ const styles = StyleSheet.create({
     screenTop: {
         flex: 0.3,
         height: 280,
-        backgroundColor: '#FF773D',
+        backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -474,7 +490,7 @@ const styles = StyleSheet.create({
         marginTop: -40,
         borderTopLeftRadius: 40, 
         borderTopRightRadius: 40,
-        padding: 20
+        paddingTop: 20
     },
     input: {
         height: 50,
@@ -520,6 +536,19 @@ const styles = StyleSheet.create({
         height: 200, 
         width: 300, 
         borderRadius: 10
-    }
+    },
+    textTitle: {
+        fontSize: 28,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontStyle: 'italic',
+        color: colors.white
+    },
+    text: {
+        color: colors.primary,
+        fontWeight: "bold",
+        fontSize: 16,
+        left: 30
+    },
     
 })

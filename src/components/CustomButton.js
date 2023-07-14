@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { colors } from '../styles/colors';
 
 export default function CustomButton({ title, onPress }) {
   return (
@@ -11,7 +12,7 @@ export default function CustomButton({ title, onPress }) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#557BF1', // Cambia aquí el color de fondo deseado
+    backgroundColor: colors.primary, // Cambia aquí el color de fondo deseado
     borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 20,

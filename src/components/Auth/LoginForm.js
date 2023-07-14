@@ -22,6 +22,9 @@ import CustomButton from "../CustomButton";
 import {auth} from "../../utils/firebaseConfig"
 import Input from "../Input";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import useAuth from "../../hooks/useAuth";
+import { db } from "../../utils/firebaseConfig";
+import { collection, query, where, getDocs, onSnapshot, orderBy, getDoc } from 'firebase/firestore';
 
 /**
 Componente de formulario de inicio de sesión
@@ -35,6 +38,49 @@ También maneja la validación del formulario y la autenticación del usuario.
 export default function LoginForm(props) {
   const { navigation } = props;
   const [error, setError] = useState("");
+  const { login } = useAuth();
+
+  /**
+   * Función para obtener datos de usuario de la base de datos
+   * @date 7/14/2023 - 12:56:21 AM
+   * @author Alessandro Guevara
+   *
+   * @param {String} idUser - id de usuario
+   * @returns {Promise Object} - objeto con estatus y datos de usuario
+   */
+  const getUserData = async (idUser) => {
+    return new Promise(async (resolve) => {
+      // Creamos referencia a la base de datos y a la colección
+      try {
+        const refCollection = collection(db, 'Usuarios');
+        const searchQuery = query(refCollection, where('uid', '==', idUser));
+        const queryFetch = await getDocs(searchQuery);
+
+        let userData;
+        queryFetch.docs.map((user) => {
+          userData = user.data();
+        });
+
+        let objResp = {
+          status: true,
+          user_data: userData,
+        }
+        resolve(objResp);
+
+      } catch (error) {
+        console.log("ERROR GET DATA USER");
+        console.log(error);
+        let objResp = {
+          status: false,
+        }
+        resolve(objResp);
+      }
+
+    })
+    
+    
+
+  }
     
   const formik = useFormik({
     initialValues: initialValues(),
@@ -49,10 +95,28 @@ export default function LoginForm(props) {
           .then((userCredential) => {
             // Acceso exitoso
             const user = userCredential.user;
-            const id_user = userCredential.providerId;
+            const id_user = user.uid;
+            const email_user = user.email;
             console.log(user);
-            console.log(id_user);
-            navigation.navigate("Tabs");
+
+            getUserData(id_user).then((result) => {
+              if(result.status) {
+                const user_data = result.user_data;
+                const objUser = {
+                  id_user: id_user,
+                  email_user: email_user,
+                  name_user: user_data.name,
+                  avatar_user: user_data.imageUri
+                }
+                login(objUser);
+                
+                navigation.navigate("Tabs");
+              }else {
+                setError("Usuario no encontrado");
+
+              }
+            })
+            
             
           })
           .catch((error) => {

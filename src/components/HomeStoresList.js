@@ -29,7 +29,9 @@ export default function HomeStoresList({stores}) {
                 keyExtractor={(stores) => String(stores.id_store)}
                 onEndReachedThreshold={0.5}
             />
-            <FloatButton handleNavigateTo={handleNavigate} screenCalled={'home'}/>
+            {stores.length < 1 && (
+                <FloatButton handleNavigateTo={handleNavigate} screenCalled={'home'}/>
+            )}
         </View>
     )
 }

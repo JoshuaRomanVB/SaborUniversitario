@@ -6,7 +6,6 @@ import StoresApi from '../api/StoresApi'
 export default function HomeScreen() {
     return (
         <SafeAreaView style={styles.container}>
-            <Text>HomeScreen</Text>
             <StoresApi />
         </SafeAreaView>
     )

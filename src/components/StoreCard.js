@@ -1,19 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native';
+import { colors } from '../styles/colors';
+import { Entypo } from '@expo/vector-icons';
 
 export default function StoreCard({dataStore}) {
 
     const navigation = useNavigation();
 
-    let name_store;
-    try {
-        name_store = dataStore.name_store;
-        
-    } catch (error) {
-        name_store = "NO NAME";
-        
-    }
+    const { name_store, name_user, image_url, school_store } = dataStore;
+    
 
     /**
      * Función para redireccionar a la screen del formulario de tienda
@@ -31,7 +27,20 @@ export default function StoreCard({dataStore}) {
             style={styles.container}
             onPress={() => handlePressCard()}
         > 
-            <Text>Store {name_store}</Text>
+            <View>
+                <Image source={{ uri: image_url }} style={styles.imageStore} />
+            </View>
+            <View style={styles.containerInfo}>
+                <View style={{flex: 0.8}}>
+                    <Text style={styles.textTitle}>{name_store}</Text>
+                    <Text style={styles.textSubTitle}>{name_user}</Text>
+                </View>
+                <View style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
+                    <Entypo name="location" size={30} color={colors.primary} />
+                    <Text style={styles.textSubTitle}>{school_store}</Text>
+                </View>
+
+            </View>
         </TouchableOpacity>
     )
 }
@@ -39,7 +48,26 @@ export default function StoreCard({dataStore}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10, 
-        backgroundColor: '#f999'
+        backgroundColor: colors.whiteLight,
+        borderRadius: 20
+    },
+    imageStore: { 
+        height: 180, 
+        width: '100%', 
+        borderRadius: 20,
+        resizeMode: 'contain'
+    },
+    containerInfo: {
+        flex: 1,
+        flexDirection: 'row',
+        padding: 10
+    },
+    textTitle: {
+        fontSize: 20,
+        fontWeight: 'bold'
+    },
+    textSubTitle: {
+        fontSize: 14,
+        fontStyle: 'italic'
     }
 });

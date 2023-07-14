@@ -2,44 +2,31 @@ import { View, Text } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import HomeStoresList from '../components/HomeStoresList';
 import { db } from '../utils/firebaseConfig';
-import { collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import useAuth from '../hooks/useAuth';
 
 export default function StoresApi() {
 
+
+    const { auth } = useAuth();
+    const { id_user } = auth;
     const [listStore, setListStore] = useState([]);
-    const storesList = [
-        {
-            id: 1,
-            name: "tienda 1",
-        },
-        {
-            id: 2,
-            name: "tienda 2",
-        }
-    ]
-
-
-    /**
-     * Función para obtener las tiendas almacenadas en la base de datos
-     * @returns 
-     */
-    const getStores = async () => {
-        
-    }
 
     useEffect(() => {
         // Creamos referencia a la base de datos y a la colección
         const refCollection = collection(db, 'Tiendas');
-        const queryFetch = query(refCollection);
+        const queryFetch = query(refCollection, where('id_user', '==', id_user), where('estatus', '==', 1));
 
         // Cada que se actualice la colección se ejecutara esta función 
         //para traer las tiendas
         const unsubscribe = onSnapshot(queryFetch, (querySnapshot) => {
             setListStore(
                 querySnapshot.docs.map((item) => ({
-                        id_store: item.id,
-                        name_store: item.data().name_store,
-                        description: item.data().description
+                    id_store: item.id,
+                    name_store: item.data().name_store,
+                    description: item.data().description,
+                    image_url: item.data().image_url,
+                    id_user: item.data().id_user
                 }))
             )
             const objStores = querySnapshot.docs.map((item) => ({
@@ -55,7 +42,7 @@ export default function StoresApi() {
     }, []);
 
     return (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, padding: 10}}>
             <HomeStoresList stores={listStore}/>
         </View>
     )
