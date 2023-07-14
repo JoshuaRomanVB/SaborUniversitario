@@ -256,7 +256,7 @@ const registerUser = async (name, email, password, imageUri) => {
   return (
     <SafeAreaView style={globalstyles.container}>
       <ImageBackground
-        source={require("../assets/images/backgroundLogin.png")}
+        source={require("../assets/fondo.png")}
         style={registerStyles.imageback}
       >
         <View style={registerStyles.overlay}>

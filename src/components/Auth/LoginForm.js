@@ -164,7 +164,7 @@ Función para establecer el esquema de validación del formulario.
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/images/backgroundLogin.png")}
+        source={require("../../assets/fondo.png")}
         style={styles.image}
       >
         <View style={styles.overlay}>
@@ -206,7 +206,7 @@ Función para establecer el esquema de validación del formulario.
           <TouchableOpacity onPress={irACrearCuenta}>
             <Text style={styles.signupText}>
               ¿No tienes una cuenta?{" "}
-              <Text style={styles.signupLink}>Registrate qquí</Text>
+              <Text style={styles.signupLink}>Registrate aquí</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -240,14 +240,14 @@ const styles = StyleSheet.create({
   },
   title: {
     marginVertical: 20,
-    color: "#557BF1",
+    color: "#100f",
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 20,
   },
   text: {
     paddingHorizontal: 20,
-    color: "#557BF1",
+    color: "#100f",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -258,6 +258,8 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     resizeMode: "cover",
+    marginLeft: -15,
+    paddingLeft:15
   },
   textContainer: {
     position: "absolute",
@@ -289,11 +291,11 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     fontWeight: "bold",
-    color: "#557BF1",
+    color: "#FFB238",
   },
   olvide: {
     fontWeight: "bold",
-    color: "#557BF1",
+    color: "#100f",
     textAlign: "right",
     paddingHorizontal: 20,
     marginVertical:10,

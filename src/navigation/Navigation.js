@@ -49,7 +49,7 @@ export default function Navigation() {
     >
       <Tab.Screen name="account" component={NavigationAccount} options={{ tabBarLabel: "Mi cuenta" }} />
       <Tab.Screen name="home" component={NavigationHome} options={{ tabBarLabel: "" }} />
-      <Tab.Screen name="favoritos" component={NavigationFavoritos} options={{ tabBarLabel: "Favoritos" }} />
+      <Tab.Screen name="favoritos" component={NavigationFavoritos} options={{ tabBarLabel: "chats" }} />
     </Tab.Navigator>
   );
 }

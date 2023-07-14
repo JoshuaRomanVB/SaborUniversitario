@@ -83,10 +83,12 @@ export const registerStyles = StyleSheet.create({
     imageback: {
       flex: 1,
       resizeMode: "cover",
+      marginLeft: -15,
+      paddingLeft:15
     },
     title: {
       marginVertical: 20,
-      color: "#557BF1",
+      color: "#100f",
       fontWeight: "bold",
       textAlign: "center",
       fontSize: 20,
