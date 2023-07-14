@@ -21,9 +21,12 @@ import ButtonText from "../components/ButtonText";
 import { colors } from "../styles/colors";
 import AwesomeAlert from "react-native-awesome-alerts";
 import * as ImagePicker from "expo-image-picker";
-import { db } from "../utils/firebaseConfig";
-import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
-import { storage } from '../utils/firebaseConfig';
+import { db,auth,storage } from "../utils/firebaseConfig";
+import { collection, query, onSnapshot, orderBy, addDoc } from "firebase/firestore";
+
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+
 
 const RegisterScreen = ({ navigation }) => {
   //Alert dialog
@@ -152,22 +155,42 @@ const RegisterScreen = ({ navigation }) => {
       // Verificar si hay una imagen seleccionada para subir
       if (fileBlob && fileName) {
         // Crear una referencia al archivo en Firebase Storage
-        const storageRef = storage.ref(fileName);
-
+        const filePath = `usuarios/${fileName}`;
+        const storageRef = ref(storage, filePath);
+  
         // Subir el blob al Firebase Storage
-        const uploadTask = storageRef.put(fileBlob);
+        const uploadTask = uploadBytesResumable(storageRef, fileBlob);
+  
         uploadTask.on(
           "state_changed",
-          null,
-          (error) => console.error(error),
+          (snapshot) => {
+            // Observar eventos de cambio de estado como progreso, pausa y reanudación
+            // Obtener el progreso de la tarea, incluyendo el número de bytes subidos y el número total de bytes a subir
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+            switch (snapshot.state) {
+              case 'paused':
+                console.log('Upload is paused');
+                break;
+              case 'running':
+                console.log('Upload is running');
+                break;
+            }
+          },
+          (error) => {
+            // Manejar errores de subida fallida
+            console.error("Error al subir la imagen:", error);
+          },
           () => {
-            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-              console.log(`Imagen subida: ${downloadURL}`);
-
+            // Manejar subida exitosa en la finalización
+            // Por ejemplo, obtener la URL de descarga: https://firebasestorage.googleapis.com/...
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              console.log('File available at', downloadURL);
+  
               // Actualizar la URL de la imagen en tu estado
               setImageUri(downloadURL);
-
-              // Llamar a handlerUpdateProfile con la nueva imagen
+  
+              // Llamar a handleregister con la nueva imagen
               handleregister(downloadURL);
             });
           }
@@ -189,29 +212,46 @@ const RegisterScreen = ({ navigation }) => {
       setShowAlertTittle("Guardando usuario");
       setShowAlertMessage("Por favor espera...");
       try {
-        // Aquí puedes hacer algo con la respuesta, como guardar un token de acceso en el almacenamiento local o en el estado global.
+        // Registrar usuario en Firebase Authentication y guardar datos en Firestore
+        await registerUser(name, email, password, imageURL);
+  
         setShowAlertProgress(false);
         setShowButton(true);
-        setShowAlertTittle("Exito en el guardado");
+        setShowAlertTittle("Éxito en el guardado");
         setShowAlertMessage("Se han guardado tus datos correctamente");
         setResponseExitoso(true);
       } catch (error) {
-        console.log(
-          "nombre " +
-            name +
-            "  email" +
-            email +
-            " pass " +
-            password
-        );
+        console.log("nombre " + name + "  email" + email + " pass " + password);
         console.error(error);
         setShowAlertProgress(false);
         setShowButton(true);
         setShowAlertTittle("Error en el guardado");
-        setShowAlertMessage("Intentelo más tarde");
+        setShowAlertMessage("Inténtelo más tarde");
       }
     }
   };
+  
+
+  // Función para registrar un nuevo usuario
+const registerUser = async (name, email, password, imageUri) => {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Guardar información adicional del usuario en Firestore
+    const userDocRef = await addDoc(collection(db, 'Usuarios'), {
+      uid: user.uid,
+      name: name,
+      email: user.email,
+      imageUri: imageUri,
+      // Agrega otros campos adicionales que desees almacenar
+    });
+
+    console.log('Usuario registrado:', userDocRef.id);
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+  }
+};
   return (
     <SafeAreaView style={globalstyles.container}>
       <ImageBackground
