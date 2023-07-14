@@ -12,6 +12,7 @@ export const ButtonPrymaryStyle = StyleSheet.create({
     },
     buttonText:{ 
         textAlign: 'center',
+        fontWeight: 'bold',
         color: colors.white,
         fontSize: 16,
     }

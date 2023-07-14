@@ -10,7 +10,7 @@ export const registerStyles = StyleSheet.create({
         position: 'relative',
       },
       image: {
-        width: '40%',
+        width: 200,
         height: 150,
         aspectRatio: 1,
         borderRadius: 90
@@ -58,5 +58,37 @@ export const registerStyles = StyleSheet.create({
 
     text: {
       ...typography.heading1,
+    },
+    containerForm:{
+      backgroundColor: "#FFF",
+      position: "absolute",
+      borderTopRightRadius: 40,
+      borderTopLeftRadius: 40,
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 500,
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.1)",
+    },
+    titleH: {
+      color: "#fff",
+      fontWeight: "bold",
+      textAlign: "center",
+      fontSize: 34,
+      marginTop: 70,
+    },
+    imageback: {
+      flex: 1,
+      resizeMode: "cover",
+    },
+    title: {
+      marginVertical: 20,
+      color: "#557BF1",
+      fontWeight: "bold",
+      textAlign: "center",
+      fontSize: 20,
     },
   });

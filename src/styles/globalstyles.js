@@ -3,6 +3,9 @@ import { colors } from './colors';
 export const globalstyles = StyleSheet.create({
     container: {
       flex: 1,
+    },
+    containerB: {
+   
       alignItems: 'center',
       justifyContent: 'center',
     },
