@@ -48,9 +48,12 @@ export default function LoginForm(props) {
         signInWithEmailAndPassword(auth, email, password)
           .then((userCredential) => {
             // Acceso exitoso
-            navigation.navigate("Tabs");
             const user = userCredential.user;
+            const id_user = userCredential.providerId;
             console.log(user);
+            console.log(id_user);
+            navigation.navigate("Tabs");
+            
           })
           .catch((error) => {
             // Error de autenticación
