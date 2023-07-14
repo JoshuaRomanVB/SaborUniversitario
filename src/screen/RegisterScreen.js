@@ -196,7 +196,7 @@ const RegisterScreen = ({ navigation }) => {
           }
         );
       } else {
-        handleregister("../assets/images/people.png");
+        handleregister("../assets/images/perfil.png");
       }
     } catch (error) {
       console.error("Error al subir la imagen:", error);
@@ -244,6 +244,7 @@ const registerUser = async (name, email, password, imageUri) => {
       name: name,
       email: user.email,
       imageUri: imageUri,
+      vendedor: false,
       // Agrega otros campos adicionales que desees almacenar
     });
 
