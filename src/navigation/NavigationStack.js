@@ -12,7 +12,7 @@ export default function NavigationAccount() {
 
     const Stack = createStackNavigator();
   return (
-    <Stack.Navigator initialRouteName='Tabs'>
+    <Stack.Navigator initialRouteName='Login'>
         <Stack.Screen name='Login' component={LoginForm} options={{headerShown: false}}/>
         <Stack.Screen name='CreateCuenta' component={CrearCuenta} options={{headerShown: false}}/>
         <Stack.Screen name='Tabs' component={Navigation} options={{headerShown: false}}/>
