@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import ProductsApi from '../api/ProductsApi'
+import { colors } from '../styles/colors';
 
 
 export default function ProductsScreen(props) {
@@ -11,10 +12,12 @@ export default function ProductsScreen(props) {
     const description = dataStore === undefined ? undefined : dataStore.description;
     const image_url = dataStore === undefined ? "" : dataStore.image_url;
     const school_store = dataStore === undefined ? "" : dataStore.school_store;
+    const id_user = dataStore === undefined ? "" : dataStore.id_user;
 
     return (
         <SafeAreaView style={styles.container}>
-            <ProductsApi idStore={id_store} nameStore={name_store}/>
+            {/* <ProductsApi idStore={id_store} nameStore={name_store} imageStore={image_url} idUserStore={id_user}/> */}
+            <ProductsApi dataStore={dataStore}/>
         </SafeAreaView>
     )
 }
@@ -22,5 +25,6 @@ export default function ProductsScreen(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    }
+    },
+    
 })

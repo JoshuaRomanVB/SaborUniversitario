@@ -5,17 +5,21 @@ import { db } from '../utils/firebaseConfig';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import useAuth from '../hooks/useAuth';
 
-export default function ProductsApi({idStore, nameStore}) {
+export default function ProductsApi({idStore, nameStore, imageStore, idUserStore, dataStore}) {
 
 
     const { auth } = useAuth();
-    const { id_user } = auth;
+    const id_user_sesion  = auth.id_user;
     const [listProducts, setListProducts] = useState([]);
+    const {  
+        id_store, name_store, description,
+        image_url,school_store, id_user
+    } = dataStore;
 
     useEffect(() => {
         // Creamos referencia a la base de datos y a la colección
         const refCollection = collection(db, 'Productos');
-        const queryFetch = query(refCollection, where('id_store', '==', idStore), where('estatus', '==', 1));
+        const queryFetch = query(refCollection, where('id_store', '==', id_store), where('estatus', '==', 1));
 
         // Cada que se actualice la colección se ejecutara esta función 
         //para traer las tiendas
@@ -46,8 +50,8 @@ export default function ProductsApi({idStore, nameStore}) {
     }, []);
 
     return (
-        <View style={{flex: 1, padding: 10}}>
-            <ProductsList products={listProducts} idStore={idStore} nameStore={nameStore}/>
+        <View style={{flex: 1}}>
+            <ProductsList products={listProducts} dataStore={dataStore}/>
         </View>
     )
 }

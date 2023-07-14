@@ -39,7 +39,7 @@ export default function StoreCard({dataStore}) {
                 </View>
                 <View style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
                     <Entypo name="location" size={30} color={colors.primary} />
-                    <Text style={styles.textSubTitle}>{school_store}</Text>
+                    <Text style={styles.textSchool}>{school_store}</Text>
                 </View>
 
             </View>
@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.whiteLight,
-        borderRadius: 20
+        borderRadius: 20,
+        margin: 10
     },
     imageStore: { 
         height: 180, 
@@ -71,5 +72,9 @@ const styles = StyleSheet.create({
     textSubTitle: {
         fontSize: 14,
         fontStyle: 'italic'
+    },
+    textSchool: {
+        fontSize: 18,
+        fontWeight: 'bold'
     }
 });

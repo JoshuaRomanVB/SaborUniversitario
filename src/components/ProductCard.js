@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: colors.whiteLight,
-        borderRadius: 20
+        borderRadius: 20,
+        margin: 10
     },
     imageStore: { 
         height: 180, 

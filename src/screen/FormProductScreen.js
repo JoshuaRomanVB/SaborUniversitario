@@ -21,6 +21,7 @@ export default function FormProductScreen(props) {
     const dataProduct = props.route.params.dataProduct;
     const id_store = props.route.params.id_store;
     const name_store = props.route.params.name_store;
+    console.log(id_store);
     const id_product = dataProduct === undefined ? undefined : dataProduct.id_product;
     const name_product = dataProduct === undefined ? undefined : dataProduct.name_product;
     const price = dataProduct === undefined ? undefined : dataProduct.price;
@@ -71,6 +72,7 @@ export default function FormProductScreen(props) {
                         image_url: urlImage,
                         estatus: 1
                     }
+                    console.log(objStore);
                     if(dataProduct != undefined) {
                         updateProduct(objStore);
                     }else {

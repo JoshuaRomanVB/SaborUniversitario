@@ -115,7 +115,7 @@ export default function FormStoreScreen(props) {
 
         await updateDoc(docRef, dataStore)
         .then(result => {
-            navigation.goBack();
+            navigation.navigate('HomeScreen', {})
         })
         .catch(error => {
             console.log(error);
