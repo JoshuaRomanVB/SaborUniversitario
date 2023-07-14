@@ -7,7 +7,7 @@ import CustomButton from '../components/CustomButton';
 import useAuth from '../hooks/useAuth';
 import { db, storage } from '../utils/firebaseConfig';
 import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useNavigation } from '@react-navigation/native';
 import Input from '../components/Input';
 import AwesomeAlert from "react-native-awesome-alerts";
@@ -20,8 +20,8 @@ export default function FormStoreScreen(props) {
     const dataStore = props.route.params.dataStore;
     const id_store = dataStore === undefined ? undefined : dataStore.id_store;
     const name_store = dataStore === undefined ? undefined : dataStore.name_store;
-    const  description = dataStore === undefined ? undefined : dataStore.description;
-    
+    const description = dataStore === undefined ? undefined : dataStore.description;
+    const image_url = dataStore === undefined ? "" : dataStore.image_url;
 
     const navigation = useNavigation();
     const { auth } = useAuth();
@@ -36,9 +36,10 @@ export default function FormStoreScreen(props) {
         showAlertTittle: "Eliminar tienda",
         showAlertMessage: "¿Estás seguro que deseas eliminar la tienda?"
     });
-    const [imageUri, setImageUri] = useState("");
+    const [imageUri, setImageUri] = useState(image_url);
     const [fileBlob, setFileBlob] = useState("");
     const [fileName, setFileName] = useState("");
+    const [pickerImageOpen, setPickerImageOpen] = useState(false);
 
     // Validación de formulario
     const formik = useFormik({
@@ -51,11 +52,16 @@ export default function FormStoreScreen(props) {
             
 
             handleUploadImage().then((result) => {
-                if(result) {
+                // resul.status => 
+                // 0 = Fallo al subir imagen
+                // 1 = Imagen subida
+                // 2 = No se selecciono una imagen, asi que no se sube imagen
+                if(result.status === 1 || result.status === 2) {
+                    const urlImage = result.status === 1 ? result.download_url : dataStore === undefined ? "" : image_url;
                     const objStore = {
                         name_store: formData.storeName,
                         description: formData.storeDescription,
-                        image_url: fileName,
+                        image_url: urlImage,
                         estatus: 1
                     }
                     if(dataStore != undefined) {
@@ -176,6 +182,11 @@ export default function FormStoreScreen(props) {
                 const fileResponse = await fetch(fileUri);
                 const fileBlob = await fileResponse.blob();
         
+                // Cambiamos estatus de pickerImageOpen para saber
+                // cuando se haya cambiado la imagen y podamos validar
+                // cuando se haga una actualización
+                setPickerImageOpen(true);
+
                 // Mostrar la imagen seleccionada sin subirla a Firebase Storage
                 setImageUri(fileUri);
         
@@ -195,66 +206,111 @@ export default function FormStoreScreen(props) {
         return new Promise(async (resolve) => {
             
             try {
-                    console.log("entry alert");
-                    setParamsAlert({
-                    ...paramsAlert,
-                    showAlert: true,
-                    showAlertProgress: true,
-                    showButtonConfirm: false,
-                    textBtnConfirm: 'Aceptar',
-                    showButtonCancel: false,
-                    textBtnCancel: 'Cancelar',
-                    showAlertTittle: "Guardando tienda",
-                    showAlertMessage: "Por favor espera un momento"
-                });
-                // Verificar si hay una imagen seleccionada para subir
-                console.log("before if");
+                  
+                // Validamos si selecciono una imagen
+                if(pickerImageOpen) {
 
-                if (fileBlob && fileName) {
-                    // Crear una referencia del storage y carpeta y nombre de la imagen que
-                    // se va a subir
-                    const storageRef = ref(storage, `storesImages/${fileName}`);
-
-                    await uploadBytes(storageRef, imageUri);
-                    resolve(true);
-                    
-
-
-                    // Subir el blob al Firebase Storage
-                    // const uploadTask = storageRef.put(fileBlob);
-                    // uploadTask.on(
-                    //     "state_changed",
-                    //     null,
-                    //     (error) => {
-                    //         console.error(error);
-                    //         resolve(false);
-                    //     },
-                    //     () => {
-                    //         uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                    //             console.log(`Imagen subida: ${downloadURL}`);
-
-                    //             // Actualizar la URL de la imagen en tu estado
-                    //             setImageUri(downloadURL);
-                    //             resolve(true);
-                                
-                    //         });
-                    //     }
-                    // );
-                } else {
-                    // handleregister("../assets/images/people.png");
                     setParamsAlert({
                         ...paramsAlert,
                         showAlert: true,
-                        showAlertProgress: false,
+                        showAlertProgress: true,
                         showButtonConfirm: false,
                         textBtnConfirm: 'Aceptar',
-                        showButtonCancel: true,
-                        textBtnCancel: 'Aceptar',
-                        showAlertTittle: "Imagen necesaria",
-                        showAlertMessage: "Por favor cargar una imagen"
+                        showButtonCancel: false,
+                        textBtnCancel: 'Cancelar',
+                        showAlertTittle: "Guardando tienda",
+                        showAlertMessage: "Por favor espera un momento"
                     });
-                    resolve(false);
+                    // Verificar si hay una imagen seleccionada para subir
+                
+
+                    if (fileBlob && fileName) {
+
+                        // Crear una referencia al archivo en Firebase Storage
+                        const filePath = `storesImages/${fileName}`;
+                        const storageRef = ref(storage, filePath);
+                
+                        // Subir el blob al Firebase Storage
+                        const uploadTask = uploadBytesResumable(storageRef, fileBlob);
+                
+                        uploadTask.on(
+                            "state_changed",
+                            (snapshot) => {
+                                // Observar eventos de cambio de estado como progreso, pausa y reanudación
+                                // Obtener el progreso de la tarea, incluyendo el número de bytes subidos y el número total de bytes a subir
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                console.log('Upload is ' + progress + '% done');
+                                switch (snapshot.state) {
+                                    case 'paused':
+                                        console.log('Upload is paused');
+                                        break;
+                                    case 'running':
+                                        console.log('Upload is running');
+                                        break;
+                                }
+                            },
+                            (error) => {
+                                // Manejar errores de subida fallida
+                                console.error("Error al subir la imagen:", error);
+                                const objResp ={
+                                    status: 0,
+                                }
+                                resolve(objResp);
+                            },
+                            () => {
+                                // Manejar subida exitosa en la finalización
+                                // Por ejemplo, obtener la URL de descarga: https://firebasestorage.googleapis.com/...
+                                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                                    console.log('File available at', downloadURL);
+                        
+                                    // retornamos objeto con status y url de archivo subido
+                                    const objResp ={
+                                        status: 1,
+                                        download_url: downloadURL
+                                    }
+                                    resolve(objResp);
+                                });
+                            }
+                        );
+
+                    } else {
+                        // handleregister("../assets/images/people.png");
+                        setParamsAlert({
+                            ...paramsAlert,
+                            showAlert: true,
+                            showAlertProgress: false,
+                            showButtonConfirm: false,
+                            textBtnConfirm: 'Aceptar',
+                            showButtonCancel: true,
+                            textBtnCancel: 'Aceptar',
+                            showAlertTittle: "Imagen necesaria",
+                            showAlertMessage: "Por favor cargar una imagen"
+                        });
+                        const objResp ={
+                            status: 0,
+                        }
+                        resolve(objResp);
+                    }
+                }else {
+                    if(dataStore === undefined) {
+                        setParamsAlert({
+                            ...paramsAlert,
+                            showAlert: true,
+                            showAlertProgress: false,
+                            showButtonConfirm: false,
+                            textBtnConfirm: 'Aceptar',
+                            showButtonCancel: true,
+                            textBtnCancel: 'Aceptar',
+                            showAlertTittle: "Imagen necesaria",
+                            showAlertMessage: "Por favor carga una imagen"
+                        });
+                    }
+                    const objResp ={
+                        status: dataStore === undefined ? 0 : 2,
+                    }
+                    resolve(objResp);
                 }
+
             } catch (error) {
                 console.error("Error al subir la imagen:", error);
                 setParamsAlert({
@@ -268,7 +324,10 @@ export default function FormStoreScreen(props) {
                     showAlertTittle: "Error imagen",
                     showAlertMessage: "Ocurrió un error al subir la imagen"
                 });
-                resolve(false);
+                const objResp ={
+                    status: 0,
+                }
+                resolve(objResp);
                 
             }
         })
@@ -350,12 +409,12 @@ export default function FormStoreScreen(props) {
                     </View>
 
                     <View style={styles.contentBtnOption}>
-                        <CustomButton title={dataStore != undefined ? 'Actualizar' : 'Guardar'} onPress={formik.handleSubmit}/>
+                        <CustomButton title={dataStore != undefined ? 'Actualizar tienda' : 'Guardar'} onPress={formik.handleSubmit}/>
                     </View>
                     
                     {dataStore != undefined && (
                         <View style={styles.contentBtnOption}>
-                            <CustomButton title={'Eliminar'} onPress={() => handlePressDelete()}/>
+                            <CustomButton title={'Eliminar tienda'} onPress={() => handlePressDelete()}/>
                         </View>
                     )}
                     
