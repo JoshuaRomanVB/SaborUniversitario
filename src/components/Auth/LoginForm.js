@@ -152,7 +152,7 @@ Función para establecer el esquema de validación del formulario.
 */
   function validationSchema() {
     return {
-      password: Yup.string().required("El nombre de usuario es obligatorio"),
+      password: Yup.string().required("La contraseña es obligatorio"),
       email: Yup.string().required("El correo electrónico es obligatorio").email("El correo electrónico no es válido"),
     };
   }
