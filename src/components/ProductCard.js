@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { colors } from '../styles/colors';
 import { Entypo } from '@expo/vector-icons';
 
-export default function ProductCard({dataProduct}) {
+export default function ProductCard({dataProduct, isVendedor, idUserAuth, idUserStore}) {
 
     const navigation = useNavigation();
 
@@ -17,14 +17,13 @@ export default function ProductCard({dataProduct}) {
      * @author Alessandro Guevara
      */
     const handlePressCard = () => {
-        // navigation.navigate('FormStore', {
-        //     dataStore: dataStore
-        // });
-        navigation.navigate('FormProduct', {
-            dataProduct: dataProduct,
-            id_store: id_store,
-            name_store: name_store
-        });
+        if(isVendedor && idUserStore === idUserAuth) {
+            navigation.navigate('FormProduct', {
+                dataProduct: dataProduct,
+                id_store: id_store,
+                name_store: name_store
+            });
+        }
     }
 
     return (

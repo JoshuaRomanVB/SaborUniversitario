@@ -9,13 +9,18 @@ export default function StoresApi() {
 
 
     const { auth } = useAuth();
-    const { id_user } = auth;
+    const { id_user, is_vendedor } = auth;
     const [listStore, setListStore] = useState([]);
 
     useEffect(() => {
         // Creamos referencia a la base de datos y a la colección
         const refCollection = collection(db, 'Tiendas');
-        const queryFetch = query(refCollection, where('id_user', '==', id_user), where('estatus', '==', 1));
+
+        // Verificamos si el usuario es vendedor
+        const queryFetch = is_vendedor ?
+                                query(refCollection, where('id_user', '==', id_user), where('estatus', '==', 1)) :
+                            query(refCollection, where('estatus', '==', 1));
+
 
         // Cada que se actualice la colección se ejecutara esta función 
         //para traer las tiendas

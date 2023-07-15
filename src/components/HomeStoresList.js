@@ -3,12 +3,13 @@ import React from 'react'
 import StoreCard from './StoreCard';
 import FloatButton from './FloatButton';
 import { useNavigation } from '@react-navigation/native';
+import useAuth from '../hooks/useAuth';
 
 export default function HomeStoresList({stores}) {
-    console.log(stores);
 
     const navigation = useNavigation();
-
+    const { auth } = useAuth();
+    const { is_vendedor } = auth; 
     /**
      * Función para navegar a pantalla FormStore
      * @date 7/13/2023 - 8:40:42 AM
@@ -29,7 +30,7 @@ export default function HomeStoresList({stores}) {
                 keyExtractor={(stores) => String(stores.id_store)}
                 onEndReachedThreshold={0.5}
             />
-            {stores.length < 1 && (
+            {stores.length < 1 && is_vendedor && (
                 <FloatButton handleNavigateTo={handleNavigate} screenCalled={'home'}/>
             )}
         </View>

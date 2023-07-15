@@ -106,7 +106,8 @@ export default function LoginForm(props) {
                   id_user: id_user,
                   email_user: email_user,
                   name_user: user_data.name,
-                  avatar_user: user_data.imageUri
+                  avatar_user: user_data.imageUri,
+                  is_vendedor: user_data.vendedor,
                 }
                 login(objUser);
                 
