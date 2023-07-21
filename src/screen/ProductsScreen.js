@@ -12,7 +12,8 @@ export default function ProductsScreen(props) {
     const description = dataStore === undefined ? undefined : dataStore.description;
     const image_url = dataStore === undefined ? "" : dataStore.image_url;
     const school_store = dataStore === undefined ? "" : dataStore.school_store;
-    const id_user = dataStore === undefined ? "" : dataStore.id_user;
+    // const id_user = dataStore === undefined ? "" : dataStore.id_user === undefined ? "" : dataStore.id_user;
+      
 
     return (
         <SafeAreaView style={styles.container}>

@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../utils/firebaseConfig";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ChatsScreen({ navigation }) {
   const [chats, setChats] = useState([]);
@@ -77,7 +78,7 @@ export default function ChatsScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.headerText}>Chats Existentes</Text>
 
       <FlatList
@@ -107,7 +108,7 @@ export default function ChatsScreen({ navigation }) {
           </TouchableOpacity>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

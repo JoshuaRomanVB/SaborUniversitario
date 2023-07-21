@@ -2,10 +2,23 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import React from "react";
 import CustomButton from "../CustomButton";
 import useAuth from "../../hooks/useAuth";
+import { useNavigation } from '@react-navigation/native';
 
 export default function UserData() {
   const { auth, logout } = useAuth();
+  const navigation = useNavigation();
   console.log(auth); // Imprimir el contenido de auth en la consola
+
+
+  /**
+   * Función para cerrar sesión y redireccionar a login
+   * @date 7/21/2023 - 8:42:01 AM
+   * @author Alessandro Guevara
+   */
+  const handleLogout = () => {
+    logout();
+    navigation.navigate('Login',{});
+  }
 
   // Verificar si el avatar es la imagen predeterminada
   const profileImageSource =
@@ -25,7 +38,7 @@ export default function UserData() {
         <Text style={styles.username}>{auth.name_user}</Text>
         <Text style={styles.email}>{auth.email_user}</Text>
       </View>
-      <CustomButton title="Cerrar sesión" onPress={logout} />
+      <CustomButton title="Cerrar sesión" onPress={() => handleLogout()} />
     </View>
   );
 }

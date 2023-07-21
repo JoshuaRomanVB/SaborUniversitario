@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     height: 200,
     width: "100%",
     borderRadius: 1,
-    resizeMode: "contain",
+    resizeMode: "cover",
   },
   textTitle: {
     fontSize: 28,

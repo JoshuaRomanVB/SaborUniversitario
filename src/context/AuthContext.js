@@ -15,7 +15,7 @@ export function AuthProvider(props){
     };
 
     const logout = () =>{
-        setAuth(undefined);
+        setAuth({});
     };
 
     const valueContext={

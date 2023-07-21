@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         height: 180, 
         width: '100%', 
         borderRadius: 20,
-        resizeMode: 'contain'
+        resizeMode: 'cover'
     },
     containerInfo: {
         flex: 1,

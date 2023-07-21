@@ -30,7 +30,7 @@ export default function Navigation() {
           } else if (route.name === "home") {
             return renderIconRM();
           } else if (route.name === "favoritos") {
-            iconName = "heart";
+            iconName = "rocketchat";
           }
 
           return <Icon name={iconName} color={color} size={size} />;
@@ -44,7 +44,7 @@ export default function Navigation() {
     >
       <Tab.Screen name="account" component={NavigationAccount} options={{ tabBarLabel: "Mi cuenta" }} />
       <Tab.Screen name="home" component={NavigationHome} options={{ tabBarLabel: "" }} />
-      <Tab.Screen name="favoritos" component={NavigationFavoritos} options={{ tabBarLabel: "chats" }} />
+      <Tab.Screen name="favoritos" component={NavigationFavoritos} options={{ tabBarLabel: "Chats" }} />
     </Tab.Navigator>
   );
 }

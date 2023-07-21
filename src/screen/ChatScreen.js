@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { collection, doc, onSnapshot, query, orderBy, where, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../utils/firebaseConfig';
+import { colors } from '../styles/colors';
 
 export default function ChatScreen({ route }) {
   const { chatId, senderId, receiverId } = route.params;
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    paddingBottom: 40
   },
   messageContainer: {
     backgroundColor: '#ebebeb',
@@ -91,7 +93,7 @@ const styles = StyleSheet.create({
   },
   currentUserMessageContainer: {
     alignSelf: 'flex-end',
-    backgroundColor: '#4caf50',
+    backgroundColor: colors.primary,
   },
   otherUserMessageContainer: {
     alignSelf: 'flex-start',
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   sendButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 12,
