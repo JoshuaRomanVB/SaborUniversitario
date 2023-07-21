@@ -1,128 +1,229 @@
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
-import StoreCard from './StoreCard';
-import FloatButton from './FloatButton';
-import { useNavigation } from '@react-navigation/native';
-import ProductCard from './ProductCard';
-import { colors } from '../styles/colors';
-import useAuth from '../hooks/useAuth';
-import { Feather } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import React, { useState } from "react";
+import StoreCard from "./StoreCard";
+import FloatButton from "./FloatButton";
+import { useNavigation } from "@react-navigation/native";
+import ProductCard from "./ProductCard";
+import { colors } from "../styles/colors";
+import useAuth from "../hooks/useAuth";
+import { Feather } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
+import { FontAwesome } from '@expo/vector-icons';
 
-export default function ProductsList({products, dataStore}) {
+export default function ProductsList({ products, dataStore }) {
+  const [sendMsg, setSendMsg] = React.useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const navigation = useNavigation();
+  const { auth } = useAuth();
+  const id_user_sesion = auth.id_user;
+  const { is_vendedor } = auth;
+  const {
+    id_store,
+    name_store,
+    description,
+    image_url,
+    school_store,
+    id_user,
+  } = dataStore;
 
-    const navigation = useNavigation();
-    const { auth } = useAuth();
-    const id_user_sesion  = auth.id_user;
-    const { is_vendedor } = auth;
-    const {  
-        id_store, name_store, description,
-        image_url,school_store, id_user
-    } = dataStore;
+  /**
+   * Función para navegar a pantalla FormStore
+   * @date 7/13/2023 - 8:40:42 AM
+   * @author Alessandro Guevara
+   */
+  const handleNavigate = () => {
+    navigation.navigate("FormProduct", {
+      dataProduct: undefined,
+      id_store: id_store,
+      name_store: name_store,
+    });
+  };
 
-    /**
-     * Función para navegar a pantalla FormStore
-     * @date 7/13/2023 - 8:40:42 AM
-     * @author Alessandro Guevara
-     */
-    const handleNavigate = () => {
-        navigation.navigate('FormProduct', {
-            dataProduct: undefined,
-            id_store: id_store,
-            name_store: name_store,
-        });
-        
+  const handlePressUpdate = () => {
+    navigation.navigate("FormStore", {
+      dataStore: dataStore,
+    });
+  };
+
+  const sendMessage = () => {
+    setSendMsg(true);
+    };
+
+    const saveMessage = () => {
+        console.log(inputValue);
     }
 
-    const handlePressUpdate = () => {
-        navigation.navigate('FormStore', {
-            dataStore: dataStore,
-        });
-    }
- 
-    const headerInfo = () => {
-        return (
-            <View style={styles.contentHeader}>
-                <View style={styles.headerScreen}>
-                    <Image source={{ uri: image_url }} style={styles.imageStore} />
-                </View>
-                <View style={styles.contentTextRow}>
-                    <View style={{flex: 0.8}}>
-                        <Text style={styles.textTitle}>{name_store}</Text>
-                    </View>
-                    {is_vendedor && id_user === id_user_sesion && (
-                        <View style={{flex: 0.2, justifyContent: 'center', alignItems: 'center', marginVertical: 5}}>
-                            <TouchableOpacity 
-                                style={styles.circleBtn}
-                                onPress={() => handlePressUpdate()}
-                            >
-                                <Feather name="edit-2" size={24} color={colors.primary}  />
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                </View>
-            </View>
-            
-        )
-    }
-
+  const headerInfo = () => {
     return (
-        <View style={styles.container}>
-
-            
-            <FlatList
-                data={products}
-                ListHeaderComponent={
-                    headerInfo
-                }
-                numColumns={1}
-                renderItem={({ item }) => <ProductCard dataProduct={item} isVendedor={is_vendedor} idUserAuth={id_user_sesion} idUserStore={id_user}/>}
-                keyExtractor={(products) => String(products.id_product)}
-                onEndReachedThreshold={0.5}
-            />
-            {is_vendedor && id_user === id_user_sesion && (
-                <FloatButton handleNavigateTo={handleNavigate} screenCalled={'products'}/>
-            )}
-
+      <View style={styles.contentHeader}>
+        <View style={styles.headerScreen}>
+          <Image source={{ uri: image_url }} style={styles.imageStore} />
         </View>
-    )
+        <View style={styles.contentTextRow}>
+          <View style={{ flex: 0.8 }}>
+            <Text style={styles.textTitle}>{name_store}</Text>
+          </View>
+          {is_vendedor && id_user === id_user_sesion && (
+            <View
+              style={{
+                flex: 0.2,
+                justifyContent: "center",
+                alignItems: "center",
+                marginVertical: 5,
+              }}
+            >
+              <TouchableOpacity
+                style={styles.circleBtn}
+                onPress={() => handlePressUpdate()}
+              >
+                <AntDesign name="shoppingcart" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={products}
+        ListHeaderComponent={headerInfo}
+        numColumns={1}
+        renderItem={({ item }) => (
+          <ProductCard
+            dataProduct={item}
+            isVendedor={is_vendedor}
+            idUserAuth={id_user_sesion}
+            idUserStore={id_user}
+          />
+        )}
+        keyExtractor={(products) => String(products.id_product)}
+        onEndReachedThreshold={0.5}
+      />
+      {is_vendedor ? null : (
+        <>
+          {sendMsg ?
+          (
+            <View>
+              <Text style={styles.titleInput}>Registra tu pedido:</Text>
+              <View style={styles.contentSelect}>
+                <TextInput style={styles.inputProducts} multiline={true}
+                onChangeText={(text) => setInputValue(text)}
+                placeholder="Ingresa tus productos aquí..."></TextInput>
+                <TouchableOpacity style={styles.btnSend} onPress={()=>saveMessage()}>
+                <FontAwesome name="send" size={44} color="black" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )  : (
+            <TouchableOpacity style={styles.floatingButton} onPress={()=> sendMessage()}>
+              <AntDesign name="shoppingcart" size={44} color="black" />
+            </TouchableOpacity>
+          ) }
+        </>
+      )}
+      {is_vendedor && id_user === id_user_sesion && (
+        <FloatButton
+          handleNavigateTo={handleNavigate}
+          screenCalled={"products"}
+        />
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1
-    },
-    headerScreen: {
-        height: 200,
-    },
-    imageStore: { 
-        height: 200, 
-        width: '100%', 
-        borderRadius: 1,
-        resizeMode: 'contain'
-    },
-    textTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        fontStyle: 'italic',
-        color: colors.white
-    },
-    contentHeader: {
-        marginBottom: 20,
-        backgroundColor: colors.primary,
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
+  container: {
+    flex: 1,
+  },
+  headerScreen: {
+    height: 200,
+  },
+  contentSelect: {
+    backgroundColor: colors.light,
+    flexDirection: "row",
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: colors.amarillo,
+    width: 66,
+    height: 66,
+    borderRadius: 33,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: colors.black,
+    borderWidth: 1,
+  },
+  titleInput: {
+    fontSize: 16,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: colors.black,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    marginBottom: 0,
+    marginTop:0,
+    backgroundColor: colors.light,
 
-    },
-    contentTextRow: {
-        flexDirection: 'row'
-    },
-    circleBtn: {
-        width: 40, 
-        height: 40, 
-        backgroundColor: colors.white, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 80, 
-    }
-
-})
+},
+  inputProducts: {
+    height: 40,
+    margin: 10,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 10,
+    borderColor: colors.primary,
+    backgroundColor: colors.whiteLight,
+    width: "80%",
+    height: 80,
+    fontSize: 16,
+    marginTop:0
+  },
+  btnSend: {
+    height: 40,
+    marginTop: 10,
+    marginBottom: 10,
+    width: "20%"
+  },
+  imageStore: {
+    height: 200,
+    width: "100%",
+    borderRadius: 1,
+    resizeMode: "contain",
+  },
+  textTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    fontStyle: "italic",
+    color: colors.white,
+  },
+  contentHeader: {
+    marginBottom: 20,
+    backgroundColor: colors.primary,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  contentTextRow: {
+    flexDirection: "row",
+  },
+  circleBtn: {
+    width: 40,
+    height: 40,
+    backgroundColor: colors.white,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 80,
+  },
+});
