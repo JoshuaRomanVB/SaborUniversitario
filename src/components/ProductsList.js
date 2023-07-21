@@ -15,12 +15,22 @@ import ProductCard from "./ProductCard";
 import { colors } from "../styles/colors";
 import useAuth from "../hooks/useAuth";
 import { Feather } from "@expo/vector-icons";
-import { AntDesign } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import {
+  collection,
+  getDocs,
+  limit,
+  addDoc,
+  query,
+  where,
+  serverTimestamp 
+} from "firebase/firestore";
+import { auth, db } from "../utils/firebaseConfig";
 
 export default function ProductsList({ products, dataStore }) {
   const [sendMsg, setSendMsg] = React.useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const navigation = useNavigation();
   const { auth } = useAuth();
   const id_user_sesion = auth.id_user;
@@ -55,11 +65,80 @@ export default function ProductsList({ products, dataStore }) {
 
   const sendMessage = () => {
     setSendMsg(true);
-    };
+  };
 
-    const saveMessage = () => {
-        console.log(inputValue);
+  const saveMessage = async () => {
+    try {
+      // Verificar si ya existe un chat entre los usuarios (caso 1)
+      const chatSnapshot1 = await getDocs(
+        query(
+          collection(db, "Chats"),
+          where("users", "==", [id_user_sesion, id_user]),
+          limit(1)
+        )
+      );
+
+      // Verificar si ya existe un chat entre los usuarios (caso 2)
+      const chatSnapshot2 = await getDocs(
+        query(
+          collection(db, "Chats"),
+          where("users", "==", [id_user, id_user_sesion]),
+          limit(1)
+        )
+      );
+
+      let chatId = "";
+
+      if (!chatSnapshot1.empty) {
+        // Existe un chat entre los usuarios (caso 1)
+        chatId = chatSnapshot1.docs[0].data().id;
+      } else if (!chatSnapshot2.empty) {
+        // Existe un chat entre los usuarios (caso 2)
+        chatId = chatSnapshot2.docs[0].data().id;
+      } else {
+        // No existe un chat entre los usuarios, crear un nuevo chat
+        chatId = generateChatId(); // Generar un ID único para el chat
+        const newChat = {
+          id: chatId,
+          users: [id_user_sesion, id_user],
+        };
+
+        await addDoc(collection(db, "Chats"), newChat);
+      }
+     
+      try {
+        const message = {
+          text: inputValue,
+          senderId: id_user_sesion,
+          receiverId: id_user,
+          timestamp: serverTimestamp(),
+          chatId: chatId, // Agregar la referencia al chat en el mensaje
+        };
+  
+        await addDoc(collection(db, 'Mensajes'), message);
+        setInputValue('');
+      } catch (error) {
+        console.log('Error al enviar el mensaje:', error);
+      }
+
+      // Redirigir a la pantalla de chat
+      navigation.navigate("chat", {
+        chatId: chatId,
+        senderId: id_user_sesion,
+        receiverId: id_user,
+      });
+    } catch (error) {
+      console.log("Error al enviar el mensaje o iniciar el chat:", error);
     }
+  };
+
+  const generateChatId = () => {
+    const randomId = Math.random().toString(36).substring(7);
+    const timestamp = Date.now().toString();
+    const chatId = `${randomId}-${timestamp}`;
+
+    return chatId;
+  };
 
   const headerInfo = () => {
     return (
@@ -112,24 +191,32 @@ export default function ProductsList({ products, dataStore }) {
       />
       {is_vendedor ? null : (
         <>
-          {sendMsg ?
-          (
+          {sendMsg ? (
             <View>
               <Text style={styles.titleInput}>Registra tu pedido:</Text>
               <View style={styles.contentSelect}>
-                <TextInput style={styles.inputProducts} multiline={true}
-                onChangeText={(text) => setInputValue(text)}
-                placeholder="Ingresa tus productos aquí..."></TextInput>
-                <TouchableOpacity style={styles.btnSend} onPress={()=>saveMessage()}>
-                <FontAwesome name="send" size={44} color="black" />
+                <TextInput
+                  style={styles.inputProducts}
+                  multiline={true}
+                  onChangeText={(text) => setInputValue(text)}
+                  placeholder="Ingresa tus productos aquí..."
+                />
+                <TouchableOpacity
+                  style={styles.btnSend}
+                  onPress={() => saveMessage()}
+                >
+                  <FontAwesome name="send" size={44} color="black" />
                 </TouchableOpacity>
               </View>
             </View>
-          )  : (
-            <TouchableOpacity style={styles.floatingButton} onPress={()=> sendMessage()}>
+          ) : (
+            <TouchableOpacity
+              style={styles.floatingButton}
+              onPress={() => sendMessage()}
+            >
               <AntDesign name="shoppingcart" size={44} color="black" />
             </TouchableOpacity>
-          ) }
+          )}
         </>
       )}
       {is_vendedor && id_user === id_user_sesion && (
@@ -154,15 +241,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   floatingButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 16,
     right: 16,
     backgroundColor: colors.amarillo,
     width: 66,
     height: 66,
     borderRadius: 33,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderColor: colors.black,
     borderWidth: 1,
   },
@@ -174,10 +261,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 10,
     marginBottom: 0,
-    marginTop:0,
+    marginTop: 0,
     backgroundColor: colors.light,
-
-},
+  },
   inputProducts: {
     height: 40,
     margin: 10,
@@ -189,13 +275,13 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 80,
     fontSize: 16,
-    marginTop:0
+    marginTop: 0,
   },
   btnSend: {
     height: 40,
     marginTop: 10,
     marginBottom: 10,
-    width: "20%"
+    width: "20%",
   },
   imageStore: {
     height: 200,
