@@ -56,9 +56,9 @@ const styles = StyleSheet.create({
         margin: 10
     },
     imageStore: { 
-        height: 180, 
+        height: 200, 
         width: '100%', 
-        borderRadius: 20,
+        borderRadius: 10,
         resizeMode: 'cover'
     },
     containerInfo: {

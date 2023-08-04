@@ -38,10 +38,9 @@ export default function StoreCard({dataStore}) {
                     <Text style={styles.textSubTitle}>{name_user}</Text>
                 </View>
                 <View style={{flex: 0.2, justifyContent: 'center', alignItems: 'center'}}>
-                    <Entypo name="location" size={30} color={colors.primary} />
+                    <Entypo name="location" size={20} color={colors.black} />
                     <Text style={styles.textSchool}>{school_store}</Text>
                 </View>
-
             </View>
         </TouchableOpacity>
     )
@@ -50,14 +49,14 @@ export default function StoreCard({dataStore}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.whiteLight,
+        backgroundColor: colors.primary,
         borderRadius: 20,
         margin: 10
     },
     imageStore: { 
-        height: 180, 
+        height: 150, 
         width: '100%', 
-        borderRadius: 20,
+        borderRadius: 10,
         resizeMode: 'cover'
     },
     containerInfo: {

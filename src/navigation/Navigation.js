@@ -10,7 +10,7 @@ export default function Navigation() {
   const Tab = createBottomTabNavigator();
 
   const tabBarOptions = {
-    activeTintColor: "#1dadc0", // Cambiar aquí el color deseado para el icono activo
+    activeTintColor: "#FF7504", // Cambiar aquí el color deseado para el icono activo
     inactiveTintColor: "gray", // Cambiar aquí el color deseado para el icono inactivo
   };
 
@@ -52,8 +52,8 @@ export default function Navigation() {
 const renderIconRM = () => {
   return (
     <Image
-      source={require("../assets/images/iconoram.png")}
-      style={{ width: 75, height: 75, top: -20 }}
+      source={require("../assets/images/homeSU.png")}
+      style={{ width: 75, height: 75, top: 12 }}
     />
   );
 }
@@ -61,8 +61,8 @@ const renderIconRM = () => {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: "#FFF",
-    borderColor: "#f6f023",
-    borderTopWidth: 2, // Opcionalmente, puedes eliminar la línea superior del tab
+   
+    // Opcionalmente, puedes eliminar la línea superior del tab
     elevation: 0, // Opcionalmente, puedes eliminar la sombra del tab en dispositivos Android
   },
 });

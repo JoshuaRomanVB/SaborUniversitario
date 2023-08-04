@@ -28,14 +28,18 @@ export default function UserData() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.circleContainer}>
+      <Image
+			 		source={require('../../assets/images/homeSU.png')}
+			 		style={{ width: 80, height: 80, top: -140, left:8}}
+		 		/>
+      <Text style={styles.title}>Bienvenido {auth.name_user}</Text>
+      <View style={styles.detailsContainer}>
+       
         <Image
           source={profileImageSource} // Utilizar la imagen correspondiente
           style={styles.profileImage}
         />
-      </View>
-      <View style={styles.detailsContainer}>
-        <Text style={styles.username}>{auth.name_user}</Text>
+        <Text style={styles.username}>{'\n'}{auth.name_user}</Text>
         <Text style={styles.email}>{auth.email_user}</Text>
       </View>
       <CustomButton title="Cerrar sesión" onPress={() => handleLogout()} />
@@ -48,6 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    
   },
   circleContainer: {
     width: 150,
@@ -58,15 +63,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   profileImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 50,
+    width: 260,
+    height: 260,
+    borderRadius: 150,
+    
   },
   detailsContainer: {
     marginVertical: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    
+    
     padding: 20,
-    borderRadius: 10,
+    borderRadius: 20,
+    width:330,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -40,
   },
   username: {
     fontSize: 24,
@@ -83,4 +94,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
   },
+  title:{
+    textAlign: 'center',
+    fontSize:40,
+    fontWeight:'bold',
+    marginTop: 40,
+    marginBottom: 45,
+    marginTop:-140,
+    color:'#FF7504'
+},
 });
